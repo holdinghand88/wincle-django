@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+{% load item_template %}
+{% load static %}
+{% block content %}      
+<div class="container-fluid">
+    <!-- start page title -->
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box">
+                <h4 class="page-title">商品販売履歴</h4>
+                
+            </div>
+        </div>
+    </div>     
+    <!-- end page title -->
+    <!-- start content -->
+    <div class="row">
+        <div class="col-xl-12 d-flex">
+            
+            <div class=" form-outline mr-2">
+                <input onkeyup="nameSearchKeyUpHandler(this);" type="search" id="name-search-field"
+                        class="form-control" placeholder="名前を検索..." aria-label="Search"/>                
+            </div>
+            <div class=" form-outline mr-2">                
+                <input onkeyup="linenameSearchKeyUpHandler(this);" type="search" id="linename-search-field"
+                        class="form-control" placeholder="Line名..." aria-label="Search"/>
+            </div>
+
+            <div>
+                <!--Modal for detail search-->
+                <button type="button" class="btn bg-info mb-2 text-white" data-toggle="modal"
+                        data-target="#login-modal"><i class="  fas fa-search mr-1"></i>詳細検索
+                </button>                
+            </div>
+            
+        </div>
+    </div>
+    <!-- Search Detail modal content -->
+    <div id="login-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" style="width:400px">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="mt-1  mb-3 text-center border-bottom">
+                        <h5 class="text-secondary">詳細検索</h5>
+                    </div>
+
+                    <form name="detailSearchForm" method="GET" novalidate action="{% url 'item:sale-history' %}" class="px-1 ">
+                        <div class="from-group">
+                            <label for="genderDetailSearch">注文日時</label>
+                            <div class="input-group">
+                                <input name="detailstart" placeholder="2022-01-01" type="date" class="form-control">
+                                <input name="detailend" placeholder="2022-12-12" type="date" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group ">
+                            <label for="nameDetailSearch">名前</label>
+                            <input name="detailNameInput" class="form-control" type="text" id="nameDetailSearch">
+                        </div>
+                        <div class="form-group ">
+                            <label for="nameDetailSearch">LINE名</label>
+                            <input name="detailLineInput" class="form-control" type="text" id="lineDetailSearch">
+                        </div>
+                        <div class="form-group ">
+                            <label for="nameDetailSearch">郵便番号</label>
+                            <input name="detailPostalInput" class="form-control" type="text" id="postalDetailSearch">
+                        </div>
+
+                        <div class="form-group mt-2">
+                            <label for="purchasedDetailSearch">商品</label>
+                            <select class="form-control" name="item" id="item">
+                                {%with request.user.account|get_item_list as items%}
+                                {%for obj in items %}
+                                <option value="{{obj.id}}">{{obj.name}}</option>
+                                {%endfor%}
+                                {%endwith%}
+                            </select>
+                        </div>
+                        <div class="form-group mt-3">
+                            <button onclick="searchDetailSubmitHandler()" class="btn btn-success" type="submit">
+                                検索
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+    <div class="row">
+        <div class="col-xl-12 col-lg-12">
+            <div class="card shadow">
+                <div class="card-body">
+                    <table class="table table-hover table-scrollable">
+                        <thead class="card-header py-3">                                
+                            <th>注文ID</th>                            
+                            <th>顧客</th>
+                            <th>受取方法</th>                            
+                            <th>支払方法</th>
+                            <th>受け取り日時</th>                                                           
+                            <th>ステータス</th>
+                            <th>支払</th>
+                            <th>受取</th>                            
+                            <th width="10%">メニュー</th>
+                        </thead>
+                        <tbody>
+                            
+                        </tbody>
+                        <tfoot class="hidden-loading">
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end content -->
+    <!-- Footer Start -->
+    <footer class="footer">
+                
+    </footer>
+    <!-- end Footer -->
+</div> <!-- container -->
+
+{% endblock content %}
+{% block scripts %}
+<script>
+    
+    
+    
+</script>
+<script>
+    items_per_page = 10;
+    current_page = 0;
+    next_page = 1;
+    fetch_ongoing = 0;
+    get_limit_for_current_screen();
+    fetch_items();
+
+    function get_limit_for_current_screen(){
+        let window_height = window.innerHeight;
+        let projects_table_body_height =  $('.table-scrollable tbody').height();
+        //let demo_row_height =  $('.projects-table .loading-progress').height();
+        //items_per_page = Math.ceil((window_height - projects_table_body_height) / demo_row_height);
+        items_per_page = 10;
+        if(items_per_page < 1){
+            items_per_page = 1;
+        }
+        console.log(items_per_page);
+    }
+
+    function fetch_items(){
+        if(fetch_ongoing == 0){
+            fetch_ongoing = 1;
+            let available_item = $('.table-scrollable tbody tr').length;
+            setTimeout(function(){
+                $.ajax({
+                    method: "GET",
+                    url: '{% url 'item:sale-history-infinite' %}',
+                    data: { limit: items_per_page, page: next_page, available_item: available_item}
+                })
+                .done(function( data ) {
+                    if(data.total_items > 0){
+                    $('.table-scrollable tbody').append(data.html);
+                    current_page++;
+                    next_page++;
+                    }
+
+                })
+                .fail(function(error) {
+                    console.log( "error" ,error);
+                })
+                .always(function() {
+                        fetch_ongoing = 0;
+                    //$('.projects-table .hidden-loading').removeClass('show');
+                });
+            },0)
+        }
+
+    }
+
+    let previous_scroll_position = 0;
+
+    $(window).scroll(function() {
+        
+        let footer_position = $('.table-scrollable tfoot').offset().top;
+        let scroll_position = window.pageYOffset + window.innerHeight;
+
+        if (scroll_position >= footer_position && !fetch_ongoing && previous_scroll_position < scroll_position) {
+            fetch_items();
+        }
+
+        previous_scroll_position = scroll_position;
+
+
+    });
+
+    $(window).resize(function(){
+        get_limit_for_current_screen();
+        fetch_items();
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,71 @@
+{% load i18n %}
+{% load account socialaccount %}
+{% load crispy_forms_tags %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8" data="text/plain">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>病院口コミ</title>
+    {% block extra_head %}
+    {% endblock %}
+    <!-- App favicon -->
+    <link rel="shortcut icon" href="">
+    <!-- App css -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" id="bs-default-stylesheet">
+    <link href="{% static 'css/app.min.css' %}" rel="stylesheet" id="app-default-stylesheet">
+    <link href="{% static 'css/bootstrap-dark.min.css' %}" rel="stylesheet" id="bs-dark-stylesheet">
+    <link href="{% static 'css/app-dark.min.css' %}" rel="stylesheet" id="app-dark-stylesheet">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <!-- icons -->
+    <link href="{% static 'css/icons.min.css' %}" rel="stylesheet" type="text/css" />
+</head>
+{% block content %}
+<body class="primary">
+  <div id="wrapper">
+    <div class="content-page">
+      <div class="container-fluid">
+        <div class="row justify-center">
+          <div class="col-xl-6 col-lg-6">
+            <div class="card shadow account-box">
+              <h1 class="page-title align-center">ログイン</h1>
+
+              <div class="login-box">
+                {% get_providers as socialaccount_providers %}
+                {% if socialaccount_providers %}
+                <div class="sign-with-google">
+                  <h3 class="sign-with-google--title primary-input-texting">グーグルアカウントでログイン</h3>
+                  
+                  <ul class="socialaccount_providers">
+                    {% include "socialaccount/snippets/provider_list.html" with process="login" %}
+                  </ul>
+                </div>
+                {% include "socialaccount/snippets/login_extra.html" %}
+                
+                {% endif %}
+                <div class="login-form">
+                    <h4 class="page-title primary-input-texting">メールアドレスとパスワードでログイン</h4>
+                    <form class="login" method="POST" action="{% url 'account_login' %}">
+                      {% csrf_token %}
+                      {{ form|crispy }}
+                      
+                      <button type="submit" class="btn btn-primary">ログインする</button>
+                    </form>
+
+                    <p class="action-text primary-input-texting">パスワードを忘れた場合は<a href="{% url 'account_reset_password' %}" >こちら</a></p>
+                    <p class="action-text primary-input-texting">新規登録は<a href="{{ signup_url }}">こちら</a></p>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+
+{% endblock %}

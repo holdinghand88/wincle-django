@@ -1,0 +1,292 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}      
+<div class="container-fluid">
+    <!-- start page title -->
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box">
+                <h4 class="page-title">顧客情報</h4>
+                
+            </div>
+        </div>
+    </div>     
+    <!-- end page title -->
+    <!-- start content -->
+    <div class="row">
+        <div class="col-lg-4 col-xl-4">
+            <div class="card text-center">
+                <div class="card-body">                    
+                    <img src="{%if customer.avatar%}{{customer.avatar.url}}{%else%}{%static 'assets/images/man.png'%}{%endif%}" class="rounded-circle avatar-xl img-thumbnail" id="avatar_preview" alt="profile-image">
+                    
+                    <h4 class="mt-3 mb-0">{{customer.name}}</h4>                    
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="file" name="user_avatar" data-id="{{ customer.id }}" id="user_avatar" class="btn btn-success btn-xs waves-effect mb-2 waves-light" accept="image/*">
+                    </form>
+
+                    <div class="text-left mt-3">
+                        <h4 class="font-13 text-uppercase">個人情報 :</h4>
+                        <div class="table-responsive">
+                            <table class="table table-borderless table-sm">
+                                <tbody>
+                                    <tr>
+                                        <th scope="row">氏名 :</th>
+                                        <td class="text-muted">{{customer.name}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">ライン名 :</th>
+                                        <td class="text-muted">{{customer.line_name}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">生年月日 :</th>
+                                        <td class="text-muted">{{customer.birthday}}</td>
+                                    </tr>                                    
+                                    <tr>
+                                        <th scope="row">性別 :</th>
+                                        <td class="text-muted">{%if customer.gender == 1%}男性{%else%}女性{%endif%}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">住所 :</th>
+                                        <td class="text-muted">{{customer.address}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">保有ポイント数 :</th>
+                                        <td class="text-muted">{{customer.point}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">メモ :</th>
+                                        <td class="text-muted">{{customer.memo}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">タグ :</th>
+                                        <td class="text-muted">{{customer.tags}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>                    
+                </div>
+            </div> <!-- end card-box -->            
+
+        </div> <!-- end col-->
+
+        <div class="col-lg-8 col-xl-8">
+            <div class="card">
+                <div class="card-body">
+                    <ul class="nav nav-pills navtab-bg">
+                        <li class="nav-item">
+                            <a href="#about-me" data-toggle="tab" aria-expanded="true" class="nav-link active ml-0">
+                                <i class="mdi mdi-face-profile mr-1"></i>プロフィール
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="#settings" data-toggle="tab" aria-expanded="false" class="nav-link">
+                                <i class="mdi mdi-cog mr-1"></i>編集
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <button data-toggle="modal" data-target="#stopmodal_{{ customer.id }}" class="nav-link dropdown-item is-active">{%if customer.is_leave%}<i class="mdi mdi-block-helper"></i>利用停止{%else%}活性化{%endif%}</button>
+                            <div class="modal fade" id="stopmodal_{{ customer.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        {% if customer.is_leave %}
+                                        <h4>【{{ customer.name }}】様を本当に利用停止しますか？</h4>
+                                        {% else %}
+                                        <h4>【{{ customer.name }}】様を本当に活性化しますか？</h4>
+                                        {% endif %}
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button data-id="{{ customer.id }}" class="btn btn-primary" onclick="inactiveto(this);">はい</button>
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                    <div class="tab-content">                        
+                        <div class="tab-pane show active" id="about-me">
+                            <h5 class="mb-3 text-uppercase bg-light p-2"><i class="mdi mdi-account-circle mr-1"></i>購入履歴</h5>                            
+
+                            <ul class="list-unstyled">
+                                
+                            </ul>
+
+                            <h5 class="mb-3 mt-5 text-uppercase">購入履歴</h5>
+                            
+
+                        </div>
+                        <!-- end timeline content-->
+
+                        <div class="tab-pane" id="settings">
+                            <form action="{% url 'customer:customer-update' customer_id=customer.id %}" method="POST" enctype="multipart/form-data">
+                                <h5 class="mb-3 text-uppercase bg-light p-2"><i class="mdi mdi-office-building mr-1"></i>顧客編集画面</h5>
+                                {% csrf_token %}
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <input type="hidden" class="form-control" name="account_id" value="{{request.user.account.id}}" required>
+                                        <div class="form-group">
+                                            <label for="firstname">名字</label>
+                                            <input type="text" class="form-control" name="name" id="name" value="{{customer.name}}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="firstname">ライン名</label>
+                                            <input type="text" class="form-control" name="line_name" id="line_name" value="{{customer.line_name}}">
+                                        </div>
+                                    </div>                                    
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="lastname">性別</label>
+                                            <select class="form-control" name="gender">
+                                                <option value="{{customer.gender}}" selected>{%if customer.gender%}男性{%else%}女性{%endif%}</option>
+                                                <option value="1">男性</option>
+                                                <option value="2">女性</option>
+                                            </select>
+                                            
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="birthday">生年月日</label>
+                                            <input type="date" class="form-control" name="birthday" id="id_birthday" value="{{customer.birthday}}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="phone">住所</label>
+                                            <input type="text" class="form-control" name="address" id="phone" value="{%if customer.address%}{{customer.address}}{%endif%}">
+                                        </div>
+                                    </div>
+                                    <!-- end col -->
+                                </div> <!-- end row -->
+                                
+                                <h5 class="mb-3 text-uppercase bg-light p-2"><i class="mdi mdi-office-building mr-1"></i>その他</h5>
+                                <div class="row">                                    
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="point">保有ポイント数</label>
+                                            <input type="number" class="form-control" name="point" id="point" value="{{customer.point}}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="tag">タグ</label>
+                                            <input type="text" class="form-control" name="tags" id="tags" value="{{customer.tags}}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="memo">メモ</label>
+                                            <textarea type="text" class="form-control" name="memo" id="memo" >{%if customer.memo%}{{customer.memo}}{%endif%}</textarea>
+                                        </div>
+                                    </div>
+                                </div> <!-- end row -->                                
+                                
+                                <div class="text-right">
+                                    <button type="submit" class="btn btn-success waves-effect waves-light mt-2"><i class="mdi mdi-content-save"></i> 保存する</button>
+                                </div>
+                            </form>
+                        </div>
+                        <!-- end settings content-->
+
+                    </div> <!-- end tab-content -->
+                </div>
+            </div> <!-- end card-->
+
+        </div> <!-- end col -->
+    </div>
+    <!-- end content -->
+</div> <!-- container -->
+
+{% endblock content %}
+{% block scripts %}
+<!-- Magnific Popup-->
+<script src="{% static 'assets/libs/magnific-popup/jquery.magnific-popup.min.js'%}"></script>
+<!-- DatePicker関係 -->
+<script src="{% static 'assets/js/jquery-ui.min-1.13.2.js' %}"></script>
+<link rel="stylesheet" href="{% static 'assets/js/jquery-ui-1.13.2.css' %}">
+<script src="{% static 'assets/js/datepicker-ja.js' %}"></script>
+<script>
+    console.log($('#id_birthday').text());
+    $("#id_birthday").datepicker(
+        {
+            dateFormat: 'yy-mm-dd',
+            changeYear: true,
+            changeMonth: true,
+        }
+    );
+    if($('#id_birthday').val() == ""){
+        $('#id_birthday').datepicker(
+            "setDate", new Date()
+        );
+    };   
+</script>
+<script>    
+    function addImage(input) {
+        if (input.files && input.files[0]) {
+          var reader = new FileReader();
+          
+          reader.onload = function(e) {
+            $('#avatar_preview').attr('src', e.target.result);
+          }
+          
+          reader.readAsDataURL(input.files[0]); // convert to base64 string
+        }
+    }
+    if(document.getElementById("user_avatar")) {
+        document.getElementById("user_avatar").addEventListener('change',function() {
+            var id = document.getElementById("user_avatar").getAttribute('data-id');        
+            var csrftoken = "{{ csrf_token }}";
+            var formData = new FormData();
+            formData.append('user_avatar', this.files[0]);
+            formData.append('csrfmiddlewaretoken', csrftoken);
+            formData.append('id', id);
+            console.log(formData);
+            var $this = this;
+            $.ajax({
+                url : '{% url 'customer:update_user_photo' %}',
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function(data){
+                    if(data.success){
+                        addImage($this)
+                    }
+    
+                }
+            });
+        },false);
+    }
+
+    let inactiveto = button => {
+        var customer_id = button.getAttribute('data-id');        
+        $('.modal').modal('hide');
+        $.ajax({
+            url : '{% url 'customer:inactive' %}',
+            data:{
+                customer_id: customer_id,
+                csrfmiddlewaretoken: "{{ csrf_token }}"
+            },
+            type:'POST',
+            success:function(data){
+                var data = JSON.parse(data);
+                console.log(data.active_status);
+                if(data.active_status == 1){
+                    $('.is-active').html('利用停止');
+                }else{
+                    $('.is-active').html('活性化');
+                }      
+                
+            }
+        });
+    }
+</script>
+{% endblock %}

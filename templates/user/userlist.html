@@ -1,0 +1,355 @@
+{% extends "base-admin.html" %}
+{% load static %}
+{% block content %}      
+<div class="container-fluid">
+    <!-- start page title -->
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box">
+                <h4 class="page-title">アカウント一覧</h4>
+                
+            </div>
+        </div>
+    </div>     
+    <!-- end page title -->
+    <!-- start content -->
+    <div class="row">
+        <div class="col-xl-12 col-lg-12">
+            <button data-toggle="modal" data-target="#addmodal" class="btn btn-primary btn-sm mb-1"><i class="mdi mdi-plus">&nbsp;&nbsp;アカウント追加</i></button>
+            <div class="modal fade" id="addmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4>アカウント追加</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    </div>
+                    <form action="{% url 'dashboard:useradd' %}" method="POST" enctype="multipart/form-data">   
+                        <div class="modal-body">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label>複数店舗用</label>
+                                <input type="checkbox" name="is_multiple" id="is_multiple">                                   
+                            </div>
+                            <div class="form-group" id="name">
+                                <label>店舗名</label>
+                                <input type="text" class="form-control" name="name" placeholder="店舗名">                                
+                            </div>
+                            <div class="form-group" id="referral_code" >
+                                <label>ブランドコード</label>
+                                <input type="text" class="form-control" name="referral_code"  placeholder="ブランドコード">                                
+                            </div>
+                            <div class="form-group">
+                                <label>メールアドレス*</label>
+                                <input type="email" class="form-control" name="email" placeholder="xxx@xxx.xxx" required>
+                            </div>
+                            <div class="form-group">
+                                <label>パスワード*</label>
+                                <input type="password" class="form-control" name="password1" placeholder="" required>
+                            </div>
+                            <div class="form-group">
+                                <label>パスワード確認*</label>
+                                <input type="password" class="form-control" name="password2" placeholder="" required>
+                            </div>
+                            <div class="form-group">
+                                <label>channel_id</label>
+                                <input type="text" class="form-control" name="channel_id" placeholder="channel_id">                                
+                            </div>
+                            <div class="form-group">
+                                <label>channel_secret</label>
+                                <input type="text" class="form-control" name="channel_secret" placeholder="channel_secret">                                
+                            </div>
+                            <div class="form-group">
+                                <label>access_token</label>
+                                <input type="text" class="form-control" name="access_token" placeholder="access_token">                                
+                            </div>                            
+                            
+                        </div>                                     
+                        <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">キャンセル</button>
+                        <button type="submit" class="btn btn-primary">追加</button>
+                        </div>
+                    </form>
+                </div>
+                </div>
+            </div>
+            <div class="card shadow">
+                <div class="card-body userlist">
+                    <table class="table table-hover table-scrollable">
+                        <thead class="card-header py-3">                                
+                            <th>No</th>
+                            <th>店舗名</th>
+                            <th>メールアドレス</th> 
+                            <th>状態</th>
+                            <th></th>
+                            <th>メニュー</th>                                
+                        </thead>
+                        <tbody>
+                            {% for user in object_list %}
+                            <tr data-index="{{user.id}}" class="list-item">
+                                <td>{{ forloop.counter}}</td>
+                                <td>{%if user.is_multiple%}マスター:{{user.account.name}}{%else%}{{ user.account.name }}{%endif%}</td>
+                                <td>{{ user.email }}</td>
+                                <td>{% if user.is_active %}有効
+                                    {% else %}停止中
+                                    {% endif %}
+                                </td>
+                                <td>{{ user.referral_code }}</td>
+                                <td >
+                                    <ul class="list-inline mb-0">
+                                        {%if user.is_multiple %}
+                                        <li class="list-inline-item">
+                                            <button data-toggle="modal" data-target="#childaddmodal_{{ user.id }}" class="dropdown-item"> <i class="mdi mdi-plus"></i>追加</button>
+                                        </li>
+                                        {%endif%}
+                                        <li class="list-inline-item">
+                                            <button data-toggle="modal" data-target="#editmodal_{{ user.id }}" class="dropdown-item"> <i class="mdi mdi-square-edit-outline"></i>編集</button>
+                                        </li>
+                                        <li class="list-inline-item">
+                                            <a href="{%url 'dashboard:user-login' pk=user.id%}" class="dropdown-item"> <i class="mdi mdi-login"></i>ログイン</a>
+                                        </li>
+                                        <li class="list-inline-item">                                        
+                                            <button data-toggle="modal" data-target="#stopmodal_{{ user.id }}" class="dropdown-item"><i class="mdi mdi-block-helper"></i>{%if user.is_active%}利用停止{%else%}活性化{%endif%}</button>
+                                        </li>
+                                        <li class="list-inline-item">
+                                            <button data-toggle="modal" data-target="#deletemodal_{{ user.id }}" class="dropdown-item"><i class="mdi mdi-delete"></i>削除</button>
+                                        </li>
+                                    </ul>                                
+                                </td>
+                                <div class="modal fade" id="childaddmodal_{{ user.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h4>ユーザー追加</h4>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        </div>
+                                        <form action="{% url 'dashboard:childuseradd' %}" method="POST" enctype="multipart/form-data">   
+                                            <div class="modal-body">
+                                                {% csrf_token %}
+                                                <input type="hidden" class="form-control" name="referral_code" value="{{user.referral_code}}">                                       
+                                                <div class="form-group ">
+                                                    <label>店舗名</label>
+                                                    <input type="text" class="form-control" name="name" placeholder="店舗名" required>                                
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>メールアドレス*</label>
+                                                    <input type="email" class="form-control" name="email" placeholder="xxx@xxx.xxx" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>パスワード*</label>
+                                                    <input type="password" class="form-control" name="password1" placeholder="" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>パスワード確認*</label>
+                                                    <input type="password" class="form-control" name="password2" placeholder="" required>
+                                                </div>
+                                            </div>                                     
+                                            <div class="modal-footer">
+                                            <button type="button" class="btn btn-danger" data-dismiss="modal">キャンセル</button>
+                                            <button type="submit" class="btn btn-primary">追加</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    </div>
+                                </div>                           
+                                <div class="modal fade" id="editmodal_{{ user.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h4>アカウント編集</h4>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        </div>
+                                        <form action="{% url 'dashboard:userupdate' pk=user.id %}" method="POST" enctype="multipart/form-data">   
+                                            <div class="modal-body">
+                                                {% csrf_token %}
+                                                <div class="form-group">
+                                                    {%if user.is_multiple%}
+                                                    <label>ブランドコード</label>
+                                                    <input type="text" class="form-control" name="referral_code" value="{{user.referral_code}}"> 
+                                                    {%else%}
+                                                    <label>店舗名</label>                                                                                                       
+                                                    <input type="text" class="form-control" name="name" value="{{user.account.name}}"> 
+                                                    {%endif%}                                
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>メールアドレス*</label>
+                                                    <input type="email" class="form-control" name="email" value="{{user.email}}" required>
+                                                </div>                                                
+                                                <div class="form-group">
+                                                    <label>channel_id</label>
+                                                    <input type="text" class="form-control" name="channel_id" value="{{user.account.channel_id}}">                                
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>channel_secret</label>
+                                                    <input type="text" class="form-control" name="channel_secret" value="{{user.account.channel_secret}}">                                
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>access_token</label>
+                                                    <input type="text" class="form-control" name="access_token" value="{{user.account.access_token}}">                                
+                                                </div>                                                    
+                                                
+                                            </div>                                     
+                                            <div class="modal-footer">
+                                            <button type="button" class="btn btn-danger" data-dismiss="modal">キャンセル</button>
+                                            <button type="submit" class="btn btn-primary">変更する</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    </div>
+                                </div>
+                                <div class="modal fade" id="stopmodal_{{ user.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            {% if user.is_active %}
+                                            <h4>【{{ user.email }}】様を本当に利用停止しますか？</h4>
+                                            {% else %}
+                                            <h4>【{{ user.email }}】様を本当に活性化しますか？</h4>
+                                            {% endif %}
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button data-id="{{ user.id }}" class="btn btn-primary" onclick="inactiveto(this);">はい</button>
+                                        </div>
+                                    </div>
+                                    </div>
+                                </div>
+                                <div class="modal fade" id="deletemodal_{{ user.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h4>【{{ user.email }}】様を本当に削除しますか?</h4>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        </div>
+                                        <form action="{% url 'dashboard:userdelete' pk=user.id %}" method="POST" enctype="multipart/form-data">   
+                                            {% csrf_token %}                                     
+                                            <div class="modal-footer">
+                                            <button type="button" class="btn btn-danger" data-dismiss="modal">キャンセル</button>
+                                            <button type="submit" class="btn btn-primary">はい</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    </div>
+                                </div>
+                                
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        
+                    </table>
+
+                    <!--Pagination-->
+                    {% if is_paginated %}
+                    <nav class="d-flex justify-content-center wow fadeIn">
+                        <ul class="pagination pg-blue">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item btn-prev">
+                            <a
+                            class="page-link"
+                            href="?page={{ page_obj.previous_page_number }}"
+                            aria-label="Previous"
+                            >
+                            <span aria-hidden="true">&laquo;</span>
+                            <span class="sr-only">Previous</span>
+                            </a>
+                        </li>                        
+                        {% endif %}
+                        
+                        {% for i in page_obj.paginator.page_range %}
+                            {% if page_obj.number == i %}
+                            <li class="page-item active">
+                            <a class="page-link" href="?page={{ page_obj.number }}"
+                                >{{ i }}
+                                <span class="sr-only">(current)</span>
+                            </a>
+                            </li>
+                            {% else %}
+                            <li class="page-item">
+                            <a class="page-link" href="?page={{ i }}"
+                            >{{ i }}        
+                            </a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                        <li class="page-item btn-next">
+                            <a
+                            class="page-link"
+                            href="?page={{ page_obj.next_page_number }}"
+                            aria-label="Next"
+                            >
+                            <span aria-hidden="true">&raquo;</span>
+                            <span class="sr-only">Next</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end content -->
+</div> <!-- container -->
+
+{% endblock content %}
+{% block scripts %}
+<script>
+    
+    let inactiveto = button => {
+        var user_id = button.getAttribute('data-id');        
+        $('.modal').modal('hide');
+        $.ajax({
+            url : '{% url 'dashboard:inactive' %}',
+            data:{
+                user_id: user_id,
+                csrfmiddlewaretoken: "{{ csrf_token }}"
+            },
+            type:'POST',
+            success:function(data){
+                var data = JSON.parse(data);
+                console.log(data.active_status);
+                if(data.active_status == 1){
+                    $('.list-item[data-index="' + user_id + '"]').find('td:eq(2)').html('有効');
+                }else{
+                    $('.list-item[data-index="' + user_id + '"]').find('td:eq(2)').html('停止中');
+                }      
+                
+            }
+        });
+    }
+    $("#referral_code").css('display','none');
+    $("#name").css('display','none');
+    var is_multiple = $('input[type=checkbox][name=is_multiple]').prop('checked');
+    console.log(is_multiple);
+    if(is_multiple == false){
+        $("#name").css('display','block');
+    }else{
+        $("#referral_code").css('display','block');
+    }
+    $('input[type=checkbox][name=is_multiple]').change(function(){
+        const multiple = $('input[type=checkbox][name=is_multiple]').prop('checked');
+        console.log(multiple);
+        if(multiple == true){
+            $("#referral_code").css('display','block');
+            $("#name").css('display','none');
+        }else{
+            $("#name").css('display','block');
+            $("#referral_code").css('display','none');
+        }
+        
+    });
+    
+</script>
+{% endblock %}

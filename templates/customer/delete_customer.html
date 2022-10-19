@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% load static %}
+    <!--Html content will be rendered here-->
+<!-- Delete Modal HTML -->
+<div id="deleteEmployeeModal" class="">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<form method="post" novalidate>
+				<div class="modal-header">
+					<h4 class="modal-title">顧客削除</h4>
+					<a href="{% url 'customer:customers-list' %}" type="button" class="close text-decoration-none" data-dismiss="modal" aria-hidden="true">&times;</a>
+				</div>
+				<div class="modal-body">
+                    {% csrf_token %}
+					<p>Are you sure you want to delete <b>"{{ customer.name }}"</b>?</p>
+					<p class="text-danger"><small>This action cannot be undone.</small></p>
+				</div>
+				<div class="modal-footer">
+					<a href="{% url 'customer:customers-list' %}" class="btn bg-info text-white ">キャンセル</a>
+					<input type="submit" class="btn btn-danger" value="削除">
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+{% endblock %}
+
+
+{% block scripts %}
+    <!--Scripts will be rendered here-->
+{% endblock %}

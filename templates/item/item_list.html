@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}      
+<div class="container-fluid">
+    <!-- start page title -->
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box">
+                <h4 class="page-title">商品一覧</h4>
+                <form method="GET" novalidate action="{% url 'item:item-list' %}">
+                    <div class="d-flex">
+                        <input onkeyup="nameSearchKeyUpHandler(this);" type="search"  name="searchfield" id="searchfield" value="{% if request.session.search_key %}{{request.session.search_key}}{% endif %}"
+                                class="form-control" placeholder="名前を検索..." aria-label="Search"/>  
+                        <button class="btn btn-success btn-sm" type="submit">検索</button>              
+                    </div>
+                    
+                </form>
+                <a href="{% url 'item:item-create'%}" class="btn btn-primary btn-sm mb-1"><i class="mdi mdi-plus">&nbsp;&nbsp;商品追加</i></a>
+                <!--<button data-toggle="modal" data-target="#addmodal" class="btn btn-primary btn-sm mb-1"><i class="mdi mdi-plus">&nbsp;&nbsp;商品追加</i></button>
+                <div class="modal fade" id="addmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4>商品追加</h4>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                </div>
+                                <form action="{% url 'dashboard:useradd' %}" method="POST" enctype="multipart/form-data">   
+                                    <div class="modal-body">
+                                        {% csrf_token %}
+                                        <div class="form-group">
+                                            <label>商品名</label>
+                                            <input type="checkbox" name="is_multiple" id="is_multiple">                                   
+                                        </div>
+                                        <div class="form-group" id="name">
+                                            <label>商品画像1</label>
+                                            <input type="text" class="form-control" name="name" placeholder="店舗名">                                
+                                        </div>
+                                        <div class="form-group" id="referral_code" >
+                                            <label>ブランドコード</label>
+                                            <input type="text" class="form-control" name="referral_code"  placeholder="ブランドコード">                                
+                                        </div>
+                                        <div class="form-group">
+                                            <label>メールアドレス*</label>
+                                            <input type="email" class="form-control" name="email" placeholder="xxx@xxx.xxx" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>パスワード*</label>
+                                            <input type="password" class="form-control" name="password1" placeholder="" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>パスワード確認*</label>
+                                            <input type="password" class="form-control" name="password2" placeholder="" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>channel_id</label>
+                                            <input type="text" class="form-control" name="channel_id" placeholder="channel_id">                                
+                                        </div>
+                                        <div class="form-group">
+                                            <label>channel_secret</label>
+                                            <input type="text" class="form-control" name="channel_secret" placeholder="channel_secret">                                
+                                        </div>
+                                        <div class="form-group">
+                                            <label>access_token</label>
+                                            <input type="text" class="form-control" name="access_token" placeholder="access_token">                                
+                                        </div>                            
+                                        
+                                    </div>                                     
+                                    <div class="modal-footer">
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal">キャンセル</button>
+                                    <button type="submit" class="btn btn-primary">追加</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>-->
+            </div>
+        </div>
+    </div>     
+    <!-- end page title -->
+    <!-- start content -->
+    <div class="row items-list">
+        
+    </div>
+    <!-- end content -->
+    <!-- Footer Start -->
+    <footer class="footer">
+                
+    </footer>
+    <!-- end Footer -->
+</div> <!-- container -->
+
+{% endblock content %}
+{% block scripts %}
+<script>
+    
+    
+    
+</script>
+<script>
+    items_per_page = 8;
+    current_page = 0;
+    next_page = 1;
+    fetch_ongoing = 0;
+    get_limit_for_current_screen();
+    fetch_items();
+
+    function get_limit_for_current_screen(){
+        let window_height = window.innerHeight;
+        let projects_table_body_height =  $('.items-list').height();
+        //let demo_row_height =  $('.projects-table .loading-progress').height();
+        //items_per_page = Math.ceil((window_height - projects_table_body_height) / demo_row_height);
+        items_per_page = 8;
+        if(items_per_page < 1){
+            items_per_page = 1;
+        }
+        console.log(items_per_page);
+    }
+    
+    function fetch_items(){
+        if(fetch_ongoing == 0){
+            fetch_ongoing = 1;
+            let available_item = $('.item-body').length;
+            
+            setTimeout(function(){
+                var search_key = $("#searchfield").val();
+                $.ajax({
+                    method: "GET",
+                    url: '{% url 'item:infinitescroll' %}',
+                    data: { limit: items_per_page, page: next_page, available_item: available_item, search_key:search_key}
+                })
+                .done(function( data ) {
+                    if(data.total_items > 0){
+                        $('.items-list').append(data.html);
+                        current_page++;
+                        next_page++;
+                    }
+
+                })
+                .fail(function(error) {
+                    console.log( "error" ,error);
+                })
+                .always(function() {
+                        fetch_ongoing = 0;
+                    //$('.projects-table .hidden-loading').removeClass('show');
+                });
+            },0)
+        }
+
+    }
+
+    let previous_scroll_position = 0;
+
+    $(window).scroll(function() {
+        
+        let footer_position = $('.footer').offset().top;
+        let scroll_position = window.pageYOffset + window.innerHeight;
+
+        if (scroll_position >= footer_position && !fetch_ongoing && previous_scroll_position < scroll_position) {
+            fetch_items();
+        }
+
+        previous_scroll_position = scroll_position;
+
+
+    });
+
+    $(window).resize(function(){
+        get_limit_for_current_screen();
+        fetch_items();
+    });
+</script>
+{% endblock %}

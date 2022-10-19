@@ -1,0 +1,91 @@
+h1,
+h2,
+h3,
+h4,
+h5,
+p {
+    color: #333;
+}
+
+.primary {
+    background-color: #3e78cf;
+}
+
+.justify-center {
+    justify-content: center;
+}
+
+.align-center {
+    text-align: center;
+}
+
+.account-box {
+    background-color: #fff;
+    color: #333;
+    padding: 1rem;
+}
+
+#id_login,
+#id_password,
+#id_password1,
+#id_password2,
+#id_email {
+    width: 100%;
+}
+
+.page-title {
+    color: #333;
+}
+
+#div_id_remember {
+    display: none;
+}
+
+a:hover {
+    color: #3e78cf;
+}
+
+.messages {
+    position: absolute;
+    top: 95px;
+    left: 50%;
+    z-index: 9999;
+    width: 50%;
+    transform: translateX(-40%);
+}
+
+.alert-error {
+    background: #ff6868;
+}
+
+.table tbody tr td {
+    position: relative;
+}
+
+.hospital tbody tr th {
+    width: 10%;
+}
+
+.reputation tbody tr th {
+    width: 25%;
+}
+
+.table-borderless tbody+tbody,
+.table-borderless td,
+.table-borderless th,
+.table-borderless thead th {
+    border-top: 1px solid #edeff1;
+}
+
+input[type=checkbox],
+input[type=radio] {
+    width: fit-content;
+}
+
+.timeline-sm {
+    padding-left: 150px
+}
+
+.timeline-sm .timeline-sm-item .timeline-sm-date {
+    left: -145px;
+}

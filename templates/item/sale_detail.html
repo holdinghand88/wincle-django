@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% load item_template %}
+{% load static %}
+{% block content %}      
+<div class="container-fluid">
+    <!-- start page title -->
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box">
+                <h4 class="page-title">注文詳細</h4>
+                
+            </div>
+        </div>
+    </div>     
+    <!-- end page title -->
+    <!-- start content -->
+    <div class="row">
+        <div class="col-lg-8 col-xl-8">
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST" action="{%url 'item:item-detail' pk=object.id%}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6">                            
+                                <div class="form-group">
+                                    <label for="name">商品名</label>
+                                    <input type="text" class="form-control" name="name" id="name" value="{{object.name}}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <button type="submit" class="btn btn-success waves-effect waves-light mt-2"><i class="mdi mdi-content-save"></i> 保存する</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-xl-4">
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST" action="{%url 'item:item-detail' pk=object.id%}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6">                            
+                                <div class="form-group">
+                                    <label for="name">商品名</label>
+                                    <input type="text" class="form-control" name="name" id="name" value="{{object.name}}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <button type="submit" class="btn btn-success waves-effect waves-light mt-2"><i class="mdi mdi-content-save"></i> 保存する</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8 col-xl-8">
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST" action="{%url 'item:item-detail' pk=object.id%}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6">                            
+                                <div class="form-group">
+                                    <label for="name">商品名</label>
+                                    <input type="text" class="form-control" name="name" id="name" value="{{object.name}}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <button type="submit" class="btn btn-success waves-effect waves-light mt-2"><i class="mdi mdi-content-save"></i> 保存する</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end content -->    
+</div> <!-- container -->
+
+{% endblock content %}
+{% block scripts %}
+<script>
+    image1.onchange = evt => {
+        const [file] = image1.files
+        if (file) {
+            image1blah.src = URL.createObjectURL(file)
+        }
+    };
+    
+    
+</script>
+
+{% endblock %}

@@ -1,0 +1,325 @@
+{% extends "base.html" %}
+{% load item_template %}
+{% load static %}
+{% block content %}      
+<div class="container-fluid">
+    <!-- start page title -->
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box">
+                <h4 class="page-title">アカウント設定</h4>
+                
+            </div>
+        </div>
+    </div>     
+    <!-- end page title -->
+    <!-- start content -->
+    <div class="row">
+        <div class="col-xl-12 col-lg-12">            
+            <div class="card shadow">
+                <div class="card-body">                    
+                    <ul class="nav nav-tabs nav-bordered nav-justified">
+                        <li class="nav-item">
+                            <a href="#home-b2" data-toggle="tab" aria-expanded="true" class="nav-link active">
+                                <span class="d-inline-block d-sm-none"><i class="mdi mdi-home-variant"></i></span>
+                                <span class="d-none d-sm-inline-block">基本情報</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#good-b2" data-toggle="tab" aria-expanded="false" class="nav-link ">
+                                <span class="d-inline-block d-sm-none"><i class="mdi mdi-account"></i></span>
+                                <span class="d-none d-sm-inline-block">物販設定</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#friend-b2" data-toggle="tab" aria-expanded="false" class="nav-link">
+                                <span class="d-inline-block d-sm-none"><i class="mdi mdi-email-variant"></i></span>
+                                <span class="d-none d-sm-inline-block">友だち紹介</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#richmenu-b2" data-toggle="tab" aria-expanded="false" class="nav-link">
+                                <span class="d-inline-block d-sm-none"><i class="mdi mdi-cog"></i></span>
+                                <span class="d-none d-sm-inline-block">リッチメニュー</span>
+                            </a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="home-b2">
+                            <form action="{% url 'dashboard:account-info-update' pk=user.id%}" method="POST" enctype="multipart/form-data">
+                                <h5 class="mb-3 text-uppercase bg-light p-2"><i class="mdi mdi-office-building mr-1"></i>基本情報</h5>
+                                {% csrf_token %}
+                                <div class="row">                                    
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="name">アカウント名</label>                                            
+                                            <input type="text" class="form-control" name="name" value="{{user.account.name}}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="avatar">アカウント画像</label>
+                                            {%if user.account.avatar%}
+                                            <img width="400" id="blah" src="{{user.account.avatar.url}}">
+                                            {%endif%}
+                                            <input type="file" class="form-control" name="avatar" id="imgInp" value="{{user.account.avatar}}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="memo">アカウント紹介文</label>
+                                            <textarea type="text" class="form-control" name="description" id="description" >{%if user.account.description%}{{user.account.description}}{%endif%}</textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="phone">Notify token</label>
+                                            <input type="text" class="form-control" name="notify_token" id="notify_token" value="{%if user.account.notify_token%}{{user.account.notify_token}}{%endif%}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="phone">住所</label>
+                                            <input type="text" class="form-control" name="address" id="address" value="{%if user.account.address%}{{user.account.address}}{%endif%}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="phone">Instagram ユーザー名</label>
+                                            <input type="text" class="form-control" name="instagram_id" id="instagram_id" value="{%if user.account.instagram_id%}{{user.account.instagram_id}}{%endif%}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="phone">LINE友達追加URL</label>
+                                            <input type="text" class="form-control" name="line_url" id="line_url" value="{%if user.account.line_url%}{{user.account.line_url}}{%endif%}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="phone">締め日</label>
+                                            <input type="number" class="form-control" name="deadline_day" id="deadline_day" value="{%if user.account.deadline_day%}{{user.account.deadline_day}}{%endif%}">
+                                        </div>
+                                    </div>
+                                    <!-- end col -->
+                                </div> <!-- end row -->   
+                                
+                                <div class="text-right">
+                                    <button type="submit" class="btn btn-success waves-effect waves-light mt-2"><i class="mdi mdi-content-save"></i> 保存する</button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="tab-pane" id="good-b2">
+                            <h5 class="mb-3 text-uppercase bg-light p-2"><i class="mdi mdi-office-building mr-1"></i>物販設定</h5>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="item_categories">商品カテゴリー</label>
+                                        {%with request.user.account|get_item_category as categories%}
+                                        {%for obj in categories %}
+                                        <li class="category_list">
+                                            <span >{{obj.name}}</span>
+                                            <button data-id="{{ obj.id }}" onclick="removeR(this);"><i class="mdi mdi-delete"></i></button>
+                                        </li>
+                                        {%endfor%}
+                                        {%endwith%}
+                                    </div>
+                                    <button data-toggle="modal" data-target="#childaddmodal" class="btn btn-primary btn-sm mb-1"><i class="mdi mdi-plus">&nbsp;&nbsp;カテゴリー追加</i></button>
+                                    <div class="modal fade" id="childaddmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h4>カテゴリー追加</h4>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>                                                
+                                            <div class="modal-body">                                                    
+                                                <div class="form-group ">
+                                                    <label>カテゴリー名</label>
+                                                    <input type="text" class="form-control" id="category_name" name="name" placeholder="商品A" required>                                
+                                                </div>                                                        
+                                            </div>                                     
+                                            <div class="modal-footer">                                                    
+                                                <button onclick="addcategory(this);" class="btn btn-primary">追加</button>
+                                            </div>                                                
+                                        </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <form action="{% url 'dashboard:salesetting-info-update' pk=user.id%}" method="POST" enctype="multipart/form-data">                                
+                                {% csrf_token %}
+                                <div class="row">                                    
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="reduction_rate">ポイント還元率</label>
+                                            <input type="number" class="form-control" name="reduction_rate" id="reduction_rate" value="{%if user.account.reduction_rate%}{{user.account.reduction_rate}}{%endif%}" step=".01">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="bank_info">銀行振込先</label>
+                                            <input type="text" class="form-control" name="bank_info" id="bank_info" value="{%if user.account.bank_info%}{{user.account.bank_info}}{%endif%}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="pay_channel_id">channel_id(LINEPay)</label>
+                                            <input type="text" class="form-control" name="pay_channel_id" id="pay_channel_id" value="{%if user.account.pay_channel_id%}{{user.account.pay_channel_id}}{%endif%}">
+                                        </div>
+                                    </div>                                    
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="pay_channel_secret">channel_secret(LINEPay)</label>
+                                            <input type="text" class="form-control" name="pay_channel_secret" id="pay_channel_secret" value="{%if user.account.pay_channel_secret%}{{user.account.pay_channel_secret}}{%endif%}">
+                                        </div>                                   
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="postage">送料</label>
+                                            <input type="number" class="form-control" name="postage" id="postage" value="{%if user.account.postage%}{{user.account.postage}}{%endif%}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="postage_free_border">送料無料設定</label>
+                                            <input type="number" class="form-control" name="postage_free_border" id="postage_free_border" value="{%if user.account.postage_free_border%}{{user.account.postage_free_border}}{%endif%}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="max_ec_point">使用上限ポイント</label>
+                                            <input type="number" class="form-control" name="max_ec_point" id="max_ec_point" value="{%if user.account.max_ec_point%}{{user.account.max_ec_point}}{%endif%}">
+                                        </div>
+                                    </div>
+                                    <!-- end col -->
+                                </div> <!-- end row -->   
+                                
+                                <div class="text-right">
+                                    <button type="submit" class="btn btn-success waves-effect waves-light mt-2"><i class="mdi mdi-content-save"></i> 保存する</button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="tab-pane" id="friend-b2">
+                            <form action="#" method="POST" enctype="multipart/form-data">
+                                <h5 class="mb-3 text-uppercase bg-light p-2"><i class="mdi mdi-office-building mr-1"></i>友だち紹介</h5>
+                                {% csrf_token %}
+                                <div class="row">                                    
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="reduction_rate">紹介した人へのポイント</label>
+                                            <input type="number" class="form-control" name="reduction_rate" id="reduction_rate" value="{%if user.account.reduction_rate%}{{user.account.reduction_rate}}{%endif%}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="bank_info">紹介された人へのポイント</label>
+                                            <input type="number" class="form-control" name="bank_info" id="bank_info" value="{%if user.account.bank_info%}{{user.account.bank_info}}{%endif%}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="item_categories">友だち紹介文</label>
+                                            <textarea type="text" class="form-control" name="item_categories" id="item_categories" >{%if user.account.item_categories%}{{user.account.item_categories}}{%endif%}</textarea>
+                                        </div>
+                                    </div>                                  
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="item_categories">友だち紹介文候補</label>
+                                            <textarea type="text" class="form-control" name="item_categories" id="item_categories" >{%if user.account.item_categories%}{{user.account.item_categories}}{%endif%}</textarea>
+                                        </div>
+                                    </div>                                    
+                                    <!-- end col -->
+                                </div> <!-- end row -->   
+                                
+                                <div class="text-right">
+                                    <button type="submit" class="btn btn-success waves-effect waves-light mt-2"><i class="mdi mdi-content-save"></i> 保存する</button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="tab-pane" id="richmenu-b2">
+                            <form action="{% url 'dashboard:account-info-update' pk=user.id%}" method="POST" enctype="multipart/form-data">
+                                <h5 class="mb-3 text-uppercase bg-light p-2"><i class="mdi mdi-office-building mr-1"></i>リッチメニュー</h5>
+                                {% csrf_token %}
+                                <div class="row">                                    
+                                    <div class="col-md-12">
+                                        <div class="form-group">                                                                      
+                                            <input type="checkbox" class="form-control" name="is_richmenu" {%if user.account.is_richmenu%}checked{%endif%}>リッチメニューをカスタマイズする
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="avatar">トーク中</label>
+                                            {%if user.account.avatar%}
+                                            <img width="400" id="blah" src="{{user.account.avatar.url}}">
+                                            {%endif%}
+                                            <input type="file" name="avatar" id="imgInp" value="{{user.account.avatar}}">
+                                        </div>
+                                    </div>                                    
+                                    <!-- end col -->
+                                </div> <!-- end row -->   
+                                
+                                <div class="text-right">
+                                    <button type="submit" class="btn btn-success waves-effect waves-light mt-2"><i class="mdi mdi-content-save"></i> 保存する</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end content -->
+</div> <!-- container -->
+
+{% endblock content %}
+{% block scripts %}
+<script>  
+    imgInp.onchange = evt => {
+        const [file] = imgInp.files
+        if (file) {
+          blah.src = URL.createObjectURL(file)
+        }
+    }
+    
+    let addcategory = button => {
+        var name = $("#category_name").val();
+        //alert(name);
+        $('.modal').modal('hide');
+        $.ajax({
+            url : '{% url 'item:add_category' %}',
+            data:{
+                name: name,
+                csrfmiddlewaretoken: "{{ csrf_token }}"
+            },
+            type:'POST',
+            success:function(data){
+                console.log(data);
+                $('.category_list').html(
+                    `<li class="category_list">
+                    <span >${name}</span>
+                    <button onclick="removeR(this);"><i class="mdi mdi-delete"></i></button>
+                </li>`
+                );                
+            }
+        });
+    }
+    let removeR = button => {
+        var id = button.getAttribute('data-id');        
+        $('.modal').modal('hide');
+        $.ajax({
+            url : '{% url 'item:delete_category' %}',
+            data:{
+                id: id,
+                csrfmiddlewaretoken: "{{ csrf_token }}"
+            },
+            type:'POST',
+            success:function(data){
+                alert("suss");
+                
+            }
+        });
+    }
+</script>
+{% endblock %}

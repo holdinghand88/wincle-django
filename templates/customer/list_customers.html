@@ -1,0 +1,536 @@
+{% extends 'base.html' %}
+
+{% block headers %}
+    {% load static %}
+    <!--Plug in-->
+    <link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css"
+          rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+    <!-- Start Content-->
+    <div class="container-fluid">
+
+        <!-- start page title -->
+        <div class="row">
+            <div class="col-12">
+                <div class="page-title-box">
+                    <h4 class="page-title">顧客一覧</h4>                    
+                </div>
+            </div>
+        </div>
+        <!-- end page title -->
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row mb-2">
+                            <div class="col-sm-6 d-flex">
+                                <div class=" form-outline mr-2">
+                                    <input onkeyup="nameSearchKeyUpHandler(this);" type="search" id="name-search-field"
+                                           class="form-control" placeholder="名前を検索..." aria-label="Search"/>
+                                </div>
+
+                                <div>
+                                    <!--Modal for detail search-->
+                                    <button type="button" class="btn bg-info mb-2 text-white" data-toggle="modal"
+                                            data-target="#login-modal"><i class="  fas fa-search mr-1"></i>詳細検索
+                                    </button>
+                                    <button type="button" class="btn bg-secondary mb-2 mr-1 text-white"
+                                            data-toggle="modal" data-target="#settings-modal"><i
+                                            class="mdi mdi-cog mr-1"></i>表示設定
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6 ">
+                                <div class="text-sm-right">
+                                    <button onclick="deleteAllButtonHandler()" class="btn btn-danger mb-2"><i class="mdi mdi-minus-circle mr-1"></i> 一括削除</button>
+                                    <a href="#" class="btn btn-success mb-2"><i class=" fab fa-line mr-1"></i> Line</a>
+                                    <button data-toggle="modal" data-target="#addmodal" class="btn btn-primary mb-2"><i class="mdi mdi-plus">&nbsp;&nbsp;新規顧客追加</i></button>
+                                    <div class="modal fade" id="addmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h4>顧客新規登録</h4>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                            </div>
+                                            <form action="{% url 'customer:customer-create' %}" method="POST" enctype="multipart/form-data">   
+                                                <div class="modal-body">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" class="form-control" name="account_id" value="{{request.user.account.id}}" required>                                              
+                                                    <div class="form-group">
+                                                        <label>名前</label>
+                                                        <input type="text" class="form-control" name="name" placeholder="山縣" required>                                                        
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label>ライン名</label>
+                                                        <input type="text" class="form-control" name="line_name" placeholder="綾子" required>                                                        
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label>性別</label>
+                                                        <select class="form-control" name="gender">
+                                                            <option value="1">男性</option>
+                                                            <option value="2">女性</option>
+                                                        </select>                                                                                                             
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label>生年月日</label>
+                                                        <input type="date" class="form-control" name="birthday" required>                                                        
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label>住所</label>
+                                                        <input type="text" class="form-control" name="address" placeholder="大阪" required>                                                        
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label>保有ポイント数</label>
+                                                        <input type="number" class="form-control" name="point">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label>メモ</label>
+                                                        <textarea class="form-control" name="memo"></textarea>
+                                                    </div>                                                                                                      
+                                                    
+                                                </div>                                     
+                                                <div class="modal-footer">
+                                                <button type="button" class="btn btn-danger" data-dismiss="modal">キャンセル</button>
+                                                <button type="submit" class="btn btn-primary">追加</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><!-- end col-->
+                        </div>
+
+                        <div class="table-responsive table-output" style="overflow-y: hidden">
+                            <table class="table table-centered dt-responsive nowrap w-100" id="products-datatable">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th style="width: 20px;">
+                                            <div class="custom-control custom-checkbox custom-checkbox-all-checked">
+                                                <input type="checkbox" class="custom-control-input checkAll" data-checkwhat="chkSelect" id="tab-1">
+                                                <label class="custom-control-label" for="tab-1">&nbsp;</label>
+                                            </div>
+                                        </th>
+                                        <th class="head-name">アイコン</th>
+                                        <th class="head-name">名前</th>
+                                        <th class="head-gender">性別</th>
+                                        <th class="head-dob">生年月日</th> 
+                                        <th class="head-product-purchased">ポイント</th>                                       
+                                        <th class="">タグ</th>
+                                        <th>会員ステータス</th>                                        
+                                        <th style="width: 75px;">アクション</th>
+                                    </tr>
+                                </thead>
+                               <!--============= New Table Body ===========-->
+                                <tbody class="table-body infinite-container">
+                                    <!--Table Body will append here-->
+                                </tbody>
+                            </table>
+                        </div>
+                        <!--infinite scrolling-->
+                        <!--{% if page_obj.has_next %}
+                                    <a class="infinite-more-link" href="?page={{ page_obj.next_page_number }}"></a>
+                                    {% endif %}
+                                    <div class="d-flex justify-content-center" id="infinite-scroll-loader" style="display:none;">
+                                        <div class="spinner-border" role="status">
+                                            <span class="sr-only">Loading...</span>
+                                        </div>
+                                    </div>-->
+                        <!--infinite scrolling-->
+                    </div>
+                </div>
+                <!-- end row -->
+            </div>
+        </div>
+        <!-- end row -->
+
+    </div> <!-- container -->
+
+    <!--Modals-->
+
+    <!-- Search Detail modal content -->
+    <div id="login-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" style="width:400px">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="mt-1  mb-3 text-center border-bottom">
+                        <h5 class="text-secondary">詳細検索</h5>
+                    </div>
+
+                    <form name="detailSearchForm" onsubmit="return false" novalidate action="#" class="px-1 ">
+                        <div class="form-group ">
+                            <label for="nameDetailSearch">名前</label>
+                            <input name="detailNameInput" class="form-control" type="text" id="nameDetailSearch"
+                                   required="" placeholder="name">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="genderDetailSearch">性別</label>
+                            <select name="detailGenderInput" class="form-control" id="genderDetailSearch">
+                                <!--<option value="" selected>select gender</option>-->
+                                <option value="1">男性</option>
+                                <option value="2">女性</option>
+                            </select>
+                        </div>
+                        <div class="from-group">
+                            <label for="genderDetailSearch">生年月日</label>
+                            <div class="input-group">
+                                <input name="detailDobInput" placeholder="date of birth" type="date" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-group mt-2">
+                            <label for="purchasedDetailSearch">ポイント</label>
+                            <input name="detailPurchasedInput" class="form-control" type="number"
+                                   id="purchasedDetailSearch" required="" placeholder="1">
+                        </div>
+
+                        <div id="detail-search-error" class="alert alert-danger mt-3" role="alert" style="display:none">
+                            <strong>All the fields are empty. Please try again.</strong>
+                        </div>
+
+
+                        <div class="form-group mt-3">
+                            <button onclick="searchDetailSubmitHandler()" class="btn btn-success" type="submit">
+                                検索
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+
+    <!-- Settings  modal content -->
+    <div id="settings-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" style="width:400px">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="mt-1  mb-3 text-center border-bottom">
+                        <h5 class="text-secondary">表示設定</h5>
+                    </div>
+
+                    <form name="displaySettingForm" onsubmit="return false" novalidate action="#" class="px-1 ">
+                        <div class="form-group ">
+                            <input id="name-checkbox" type="checkbox" checked data-toggle="toggle"
+                                   data-onstyle="primary" data-offstyle="secondary" data-size="xs">
+                            <strong class="ml-3">名前</strong>
+                        </div>
+
+                        <div class="form-group ">
+                            <input id="gender-checkbox" type="checkbox" checked data-toggle="toggle"
+                                   data-onstyle="primary" data-offstyle="secondary" data-size="xs">
+                            <strong class="ml-3">性別</strong>
+                        </div>
+
+                        <div class="form-group ">
+                            <input id="dob-checkbox" type="checkbox" checked data-toggle="toggle" data-onstyle="primary"
+                                   data-offstyle="secondary" data-size="xs">
+                            <strong class="ml-3">生年月日</strong>
+                        </div>
+
+                        <div class="form-group ">
+                            <input id="product-purchased-checkbox" type="checkbox" checked data-toggle="toggle"
+                                   data-onstyle="primary" data-offstyle="secondary" data-size="xs">
+                            <strong class="ml-3">ポイント</strong>
+                        </div>
+
+                        <div class="form-group mt-4">
+                            <button onclick="displaySettingSubmitHandler()" class="btn btn-success"> 保存</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+{% endblock %}
+
+{% block scripts %}
+    # Scripts for infinite scroll
+    <script src="{% static 'assets/js/jquery.waypoints.min.js' %}"></script>
+    <script src="{% static 'assets/js/infinite.min.js' %}"></script>
+    <script src="{% static 'assets/libs/bootstrap-datepicker/js/bootstrap-datepicker.min.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
+    <script>
+
+        let limit = 5
+        let page_no = 0;
+        let advanced_search = false;
+        const tableBody = document.querySelector(".table-body");
+        const tableOutput = document.querySelector(".table-output");
+        <!--Helper Function column show-hide-->
+        const showHideColumn = (colName, isShow) => {
+            let head = document.querySelector(".head-" + colName);
+            if (isShow === false) {
+                head.classList.add('d-none')
+            } else {
+                head.classList.remove('d-none')
+            }
+
+            let ele = document.getElementsByClassName("col-" + colName);
+            for (var i = 0; i < ele.length; i++) {
+                if (isShow === false) {
+                    ele[i].classList.add('d-none')
+                } else {
+                    ele[i].classList.remove('d-none')
+                }
+            }
+        }
+
+        const search = () => {
+            page_no += 1;
+            const searchValue = document.querySelector('#name-search-field').value
+            const name = document.detailSearchForm.detailNameInput.value
+            const gender = document.detailSearchForm.detailGenderInput.value
+            const point = document.detailSearchForm.detailPurchasedInput.value
+            const birthday = document.detailSearchForm.detailDobInput.value
+            tableOutput.style.display = "block";
+            let data;
+            if (!advanced_search) {
+                if (searchValue.trim().length >= 0) {
+                    data = {
+                        page_no: page_no,
+                        searchText: searchValue,
+                        csrfmiddlewaretoken: "{{csrf_token}}"
+                    }
+                }
+            } else {
+                data = {
+                    name: name,
+                    gender: gender,
+                    point: point,
+                    birthday: birthday,
+                    csrfmiddlewaretoken: "{{csrf_token}}",
+                    page_no: page_no
+                }
+            }
+            $.ajax({
+                type: 'GET',
+                url: '{% url "customer:customer-list-search" %}',
+                data: data,
+                success: function (data) {
+                    customer_list = []
+                    customer_list = data.customers
+                    tableOutput.style.display = "block";
+                    console.log(customer_list.length)
+                    if (customer_list.length > 0) {
+                        console.log('display')
+                        show_customer(customer_list);
+
+                    }
+
+
+                }
+            }).always(function () {
+                hideAndShowTableColumns()
+            });
+        }
+        <!--OnLoad-->
+        window.onload = function () {
+            //nameSearchKeyUpHandler()
+            search()
+            onAndOffDisplaySettingForm()
+        };
+
+        const hideAndShowTableColumns = () => {
+            if ("customerDisplaySettingObj" in localStorage) {
+                console.log('localstorage have values')
+                let getObj = window.localStorage.getItem("customerDisplaySettingObj");
+                getCustomerDisplaySettingObj = JSON.parse(getObj)
+                console.log('local storage value hideAndShowTableColumns ', getCustomerDisplaySettingObj)
+
+                showHideColumn("name", getCustomerDisplaySettingObj.nameSetting)
+                showHideColumn("dob", getCustomerDisplaySettingObj.dobSetting)
+                showHideColumn("gender", getCustomerDisplaySettingObj.genderSetting)
+                showHideColumn("product-purchased", getCustomerDisplaySettingObj.productPurchasedSetting)
+            } else {
+                console.log('storage is empty')
+            }
+        }
+
+        const onAndOffDisplaySettingForm = () => {
+            if ("customerDisplaySettingObj" in localStorage) {
+                console.log('localstorage have values')
+                let getObj = window.localStorage.getItem("customerDisplaySettingObj");
+                getCustomerDisplaySettingObj = JSON.parse(getObj)
+                console.log('local storage value', getCustomerDisplaySettingObj)
+
+                $('#name-checkbox').bootstrapToggle('off');
+                $('#dob-checkbox').bootstrapToggle('off');
+                $('#gender-checkbox').bootstrapToggle('off');
+                $('#product-purchased-checkbox').bootstrapToggle('off');
+
+                if (getCustomerDisplaySettingObj.nameSetting == true) {
+                    $('#name-checkbox').bootstrapToggle('on');
+                }
+                if (getCustomerDisplaySettingObj.dobSetting == true) {
+                    $('#dob-checkbox').bootstrapToggle('on');
+                }
+                if (getCustomerDisplaySettingObj.genderSetting == true) {
+                    $('#gender-checkbox').bootstrapToggle('on');
+                }
+                if (getCustomerDisplaySettingObj.productPurchasedSetting == true) {
+                    $('#product-purchased-checkbox').bootstrapToggle('on');
+                }
+            } else {
+                console.log('Local storage is not set')
+                $('#name-checkbox').bootstrapToggle('on');
+                $('#dob-checkbox').bootstrapToggle('on');
+                $('#gender-checkbox').bootstrapToggle('on');
+                $('#product-purchased-checkbox').bootstrapToggle('on');
+            }
+        }
+
+
+        const displaySettingSubmitHandler = () => {
+            console.log('displaySettingSubmitHandler called')
+            nameSetting = document.getElementById('name-checkbox').checked
+            dobSetting = document.getElementById('dob-checkbox').checked
+            genderSetting = document.getElementById('gender-checkbox').checked
+            productPurchasedSetting = document.getElementById('product-purchased-checkbox').checked
+
+            let customerDisplaySettingObj = {
+                nameSetting: nameSetting,
+                dobSetting: dobSetting,
+                genderSetting: genderSetting,
+                productPurchasedSetting: productPurchasedSetting,
+            }
+            console.log('here', customerDisplaySettingObj)
+            window.localStorage.setItem("customerDisplaySettingObj", JSON.stringify(customerDisplaySettingObj))
+
+            <!--Function Called-->
+            hideAndShowTableColumns()
+
+            <!--Hide modal-->
+            $('#settings-modal').modal('hide');
+        }
+
+        let customer_list = []
+        const searchDetailSubmitHandler = () => {
+            tableBody.innerHTML = "";
+            document.querySelector('#name-search-field').value = "";
+            page_no = 0;
+            advanced_search = true;
+            search();
+            <!--Hide modal-->
+            $('#login-modal').modal('hide');
+
+        }
+
+        tableOutput.style.display = "none"
+
+        const nameSearchKeyUpHandler = () => {
+            tableOutput.style.display = "block";
+            tableBody.innerHTML = "";
+            advanced_search = false;
+            page_no = 0;
+            search();
+
+        }
+
+        function show_customer(customer_list) {
+            let temp
+
+            customer_list.forEach((item) => {
+                temp += `<tr class="infinite-item">
+                            <td>
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input chkSelect" id="${item.id}">
+                                    <label class="custom-control-label" for="${item.id}">&nbsp;</label>
+                                </div>
+                            </td>
+                            <td class="col-name">
+                                <div class="media">                                            
+                                    <img src="${item.avatar}" class="mr-3 rounded-circle avatar-sm">                                                                             
+                                </div>
+                            </td>
+                            <td class="">${item.name}</td>
+                            <td class="col-gender">${item.gender}</td>
+                            <td class="col-dob">${item.birthday}</td>                                    
+                            <td class="col-product-purchased">${item.point}</td>
+                            <td class="col-tag">${item.tag}</td>                                    
+                            <td>
+                                <span class="badge badge-soft-success">${item.active}</span>
+                            </td>
+
+                            <td style="width:130px">
+                                <ul class="list-inline mb-0">
+                                    <li class="list-inline-item">
+                                        <a href="/customer/${item.id}/detail/" class="action-icon"> <i class="mdi mdi-eye"></i></a>
+                                    </li>
+                                    <li class="list-inline-item">
+                                        <a href="/customer/${item.id}/detail/" class="action-icon"> <i class="mdi mdi-square-edit-outline"></i></a>
+                                    </li>
+                                    <li class="list-inline-item">
+                                        <a href="/customer/${item.id}/delete/"  class="action-icon"> <i class="mdi mdi-delete"></i></a>
+                                    </li>
+                                </ul>
+
+                            </td>
+                        </tr>`
+
+
+            });
+            $(".table-body").append(temp)
+        }
+
+        <!--Select all checked item-->
+         $(function() {
+            $(".checkAll").click(function(){
+                checkwhat  = $(this).data("checkwhat");
+                $('input:checkbox.'+checkwhat).not(this).prop('checked', this.checked);
+            });
+          });
+
+        <!--Delete all checked item-->
+        const deleteAllButtonHandler = () => {
+            var ids = [];
+            $('#products-datatable tbody :checkbox:checked').each(function (index) {
+                var closestTr = $(this).attr('id');
+                ids.push(closestTr);
+            });
+            alert("Are sure to delete the customers from the system?");
+
+            <!--Ajax-->
+            data = {
+                checked_ids: ids,
+                csrfmiddlewaretoken: "{{csrf_token}}"
+            }
+            $.ajax({
+                type: 'POST',
+                url: '{% url "customer:customer-delete-checked" %}',
+                data: data,
+
+                success: function (data) {
+                    console.log('data', data)
+                },
+            })
+                .always(function () {
+                    nameSearchKeyUpHandler()
+                });
+        }
+
+
+        const handleScroll = () => {
+            if (window.innerHeight + window.pageYOffset + 1 >= document.body.offsetHeight) {
+                console.log('scrolled to the bottom')                
+                search();           
+
+            }
+        }
+
+        window.addEventListener('scroll', handleScroll);
+
+    </script>
+{% endblock %}
+
+

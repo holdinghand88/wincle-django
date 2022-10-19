@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+{% load core_template %}
+{% load static %}
+{% block content %}      
+<div class="container-fluid">
+    <!-- start page title -->
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box">
+                <h4 class="page-title">トーク</h4>
+                
+            </div>
+        </div>
+    </div>     
+    <!-- end page title -->
+    <!-- start content -->
+    <div class="row">
+        <!-- start chat users-->
+        <div class="col-xl-3 col-lg-4">
+            <div class="card">
+                <div class="card-body">
+
+                    <div class="media mb-3">
+                        <img src="{%if request.user.account.avatar%}{{request.user.account.avatar.url}}{%else%}{%static 'assets/images/man.png'%}{%endif%}" class="mr-2 rounded-circle" height="42" alt="Brandon Smith">
+                        <div class="media-body">
+                            <h5 class="mt-0 mb-0 font-15">
+                                <a href="contacts-profile.html" class="text-reset">{{request.user.account.name}}</a>
+                            </h5>
+                            <p class="mt-1 mb-0 text-muted font-14">
+                                <small class="mdi mdi-circle text-success"></small> Online
+                            </p>
+                        </div>
+                        <div>
+                            <a href="javascript: void(0);" class="text-reset font-20">
+                                <i class="mdi mdi-cog-outline"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- start search box -->
+                    <form class="search-bar mb-3">
+                        <div class="position-relative">
+                            <input type="text" class="form-control form-control-light" placeholder="People, groups & messages...">
+                            <span class="mdi mdi-magnify"></span>
+                        </div>
+                    </form>
+                    <!-- end search box -->
+
+                    <h6 class="font-13 text-muted text-uppercase mb-2">Contacts</h6>
+
+                    <!-- users -->
+                    <div class="row">
+                        <div class="col">
+                            <div data-simplebar style="max-height: 498px">
+                                {%for id in customer_ids%}
+                                {% with id|get_customer as customer%}
+                                <a href="{% url 'talk:talk-detail' customer_id=id%}" class="text-body">
+                                    <div class="media p-2">
+                                        <div class="position-relative">
+                                            <span class="user-status"></span>
+                                            <img src="{%if customer.avatar%}{{customer.avatar.url}}{%else%}{%static 'assets/images/man.png'%}{%endif%}" class="mr-2 rounded-circle" height="42" alt="user" />
+                                        </div>
+                                        <div class="media-body">
+                                            <h5 class="mt-0 mb-0 font-14">
+                                                <span class="float-right text-muted font-weight-normal font-12">4:30am</span>
+                                                {{customer.name}}
+                                            </h5>
+                                            <p class="mt-1 mb-0 text-muted font-14">
+                                                <span class="w-25 float-right text-right"><span class="badge badge-soft-danger">3</span></span>
+                                                <span class="w-75">おはようございます！</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </a>
+                                {% endwith %}
+                                {%endfor%}
+                            </div> <!-- end slimscroll-->
+                        </div> <!-- End col -->
+                    </div>
+                    <!-- end users -->
+                </div> <!-- end card-body-->
+            </div> <!-- end card-->
+        </div>
+        <!-- end chat users-->
+
+        <!-- chat area -->
+        <div class="col-xl-9 col-lg-8">
+
+            <div class="card">
+                <div class="card-body py-2 px-3 border-bottom border-light">
+                    <div class="media py-1">
+                        {% with selected_chatter|get_customer as customer%}
+                        <img src="{%if customer.avatar%}{{customer.avatar.url}}{%else%}{%static 'assets/images/man.png'%}{%endif%}" class="mr-2 rounded-circle" height="36" alt="Brandon Smith">
+                        <div class="media-body">
+                            <h5 class="mt-0 mb-0 font-15">
+                                <a href="contacts-profile.html" class="text-reset">{{customer.name}}</a>
+                            </h5>
+                            <p class="mt-1 mb-0 text-muted font-12">
+                                <small class="mdi mdi-circle text-success"></small> Online
+                            </p>
+                        </div>
+                        {% endwith %}
+                        <div>
+                            <a href="javascript: void(0);" class="text-reset font-19 py-1 px-2 d-inline-block" data-toggle="tooltip" data-placement="top" title="" data-original-title="Voice Call">
+                                <i class="fe-phone-call"></i>
+                            </a>
+                            <a href="javascript: void(0);" class="text-reset font-19 py-1 px-2 d-inline-block" data-toggle="tooltip" data-placement="top" title="" data-original-title="Video Call">
+                                <i class="fe-video"></i>
+                            </a>
+                            <a href="javascript: void(0);" class="text-reset font-19 py-1 px-2 d-inline-block" data-toggle="tooltip" data-placement="top" title="" data-original-title="Add Users">
+                                <i class="fe-user-plus"></i>
+                            </a>
+                            <a href="javascript: void(0);" class="text-reset font-19 py-1 px-2 d-inline-block" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete Chat">
+                                <i class="fe-trash-2"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <ul class="conversation-list chat-app-conversation" data-simplebar style="max-height: 460px">
+                        {%for talk in talks%}
+                        {%if talk.is_push %}
+                        <li class="clearfix">
+                            <div class="chat-avatar">
+                                <img src="{%if talk.customer.avatar%}{{talk.customer.avatar.url}}{%else%}{%static 'assets/images/man.png'%}{%endif%}" class="rounded" alt="James Z" />
+                                <i>{{talk.created_at}}</i>
+                            </div>
+                            <div class="conversation-text">
+                                <div class="ctext-wrap">
+                                    <i>{{talk.customer.name}}</i>
+                                    <p>
+                                        {{talk.content|safe}}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="conversation-actions dropdown">
+                                <button class="btn btn-sm btn-link text-reset" data-toggle="dropdown"
+                                    aria-expanded="false"><i class='mdi mdi-dots-vertical font-18'></i></button>
+
+                                <div class="dropdown-menu dropdown-menu-right">
+                                    <a class="dropdown-item" href="#">Copy Message</a>
+                                    <a class="dropdown-item" href="#">Edit</a>
+                                    <a class="dropdown-item" href="#">Delete</a>
+                                </div>
+                            </div>
+                        </li>
+                        {%else%}
+                        <li class="clearfix odd">
+                            <div class="chat-avatar">
+                                <img src="{%if talk.account.avatar%}{{talk.account.avatar.url}}{%else%}{%static 'assets/images/man.png'%}{%endif%}" class="rounded" alt="Nik Patel" />
+                                <i>{{talk.created_at}}</i>
+                            </div>
+                            <div class="conversation-text">
+                                <div class="ctext-wrap">
+                                    <i>{{talk.account.name}}</i>
+                                    <p>
+                                        {{talk.content|safe}}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="conversation-actions dropdown">
+                                <button class="btn btn-sm btn-link text-reset" data-toggle="dropdown"
+                                    aria-expanded="false"><i class='mdi mdi-dots-vertical font-18'></i></button>
+
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="#">Copy Message</a>
+                                    <a class="dropdown-item" href="#">Edit</a>
+                                    <a class="dropdown-item" href="#">Delete</a>
+                                </div>
+                            </div>
+                        </li>
+                        {%endif%}
+                        {%endfor%}                        
+                    </ul>
+
+                    <div class="row">
+                        <div class="col">
+                            <div class="mt-2 bg-light p-3 rounded">
+                                <form class="needs-validation" novalidate="" name="chat-form"
+                                    id="chat-form">
+                                    <div class="row">
+                                        <div class="col mb-2 mb-sm-0">
+                                            <input type="text" class="form-control border-0" placeholder="メッセージを入力してください。" required="">
+                                            <div class="invalid-feedback mt-2">
+                                                メッセージを入力してください。
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-auto">
+                                            <div class="btn-group">
+                                                <a href="#" class="btn btn-light"><i class="fe-paperclip"></i></a>
+                                                <button type="submit" class="btn btn-success chat-send btn-block"><i class='fe-send'></i></button>
+                                            </div>
+                                        </div> <!-- end col -->
+                                    </div> <!-- end row-->
+                                </form>
+                            </div> 
+                        </div> <!-- end col-->
+                    </div>
+                    <!-- end row -->
+                </div> <!-- end card-body -->
+            </div> <!-- end card -->
+        </div>
+        <!-- end chat area-->
+        
+    </div>
+    <!-- end content -->    
+</div> <!-- container -->
+
+{% endblock content %}
+{% block scripts %}
+<script>
+    image1.onchange = evt => {
+        const [file] = image1.files
+        if (file) {
+            image1blah.src = URL.createObjectURL(file)
+        }
+    };
+    
+    
+</script>
+
+{% endblock %}
