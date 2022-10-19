@@ -1,8 +1,9 @@
-# 病院口コミアプリ
+# Wincleシステム
+#### Wincleはあらゆる業種の予約・物販・マーケティングをLINE公式アカウントで自動化、情報の一元管理ができるシステムです。
 ## バックエンド
 ### Django 4.0.6, python 3.10
 ## フロントエンド
-### Reactjs, Javascript, HTML/CSS
+### LIFF, Javascript, HTML/CSS
 
 ## MacOSにDjangoをインストールする手順
 ### Pythonの仮想環境を作成します。
