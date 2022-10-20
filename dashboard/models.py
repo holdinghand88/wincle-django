@@ -145,7 +145,7 @@ class Account(models.Model):
     is_soldout_view = models.BooleanField(verbose_name=_('売り切れ表示'),default=True)
     
     # CUD履歴管理
-    history = HistoricalRecords()
+    history = HistoricalRecords(cascade_delete_history=True)
     
     def __str__(self):
         return self.user.email

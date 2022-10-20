@@ -12,6 +12,7 @@ from ..forms import AddUserCreateForm,AddChildUserCreateForm
 from ..permissions import SuperUserCheck,StaffUserCheck
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.forms import PasswordChangeForm
+from item.models import Item
 
 class UserManageView(SuperUserCheck,ListView):
     model = User
@@ -117,3 +118,32 @@ def userinfoupdate(request,pk):
         print('failed!')
         messages.add_message(request, messages.ERROR, '失敗!') 
         return redirect(reverse("dashboard:usermanage"))
+
+class AccountHistoryView(SuperUserCheck,ListView):
+    model = Account
+    paginate_by = 10
+    template_name = 'user/account_history.html'
+    
+    def get_queryset(self):
+        
+        return Account.history.all()
+    
+@user_passes_test(lambda u: u.is_superuser)
+def delete_account_history(request, history_id):    
+    Account.history.filter(history_id=history_id).delete()  
+    
+    return redirect(reverse("dashboard:account-history"))
+    
+class ItemHistoryView(SuperUserCheck,ListView):
+    model = Item
+    paginate_by = 10
+    template_name = 'user/item_history.html'
+    
+    def get_queryset(self):        
+        return Item.history.all()
+
+@user_passes_test(lambda u: u.is_superuser)
+def delete_item_history(request, history_id):    
+    Item.history.filter(history_id=history_id).delete()  
+    
+    return redirect(reverse("dashboard:item-history"))

@@ -24,4 +24,9 @@ urlpatterns = [
     path('account-info-update/<str:pk>', user_views.update_account_info, name='account-info-update'),
     path('salesetting-info-update/<str:pk>', user_views.update_salesetting_info, name='salesetting-info-update'),
     
+    ##履歴
+    path('account-history', admin_views.AccountHistoryView.as_view(), name='account-history'),
+    path('account-history/delete/<int:history_id>', admin_views.delete_account_history, name='delete_account_history'),
+    path('item-history', admin_views.ItemHistoryView.as_view(), name='item-history'),
+    path('item-history/delete/<int:history_id>', admin_views.delete_item_history, name='delete_item_history'),
 ]

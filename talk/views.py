@@ -21,16 +21,11 @@ class TalkView(LoginRequiredMixin,TemplateView):
         customer_ids = Talk.objects.filter(account=request.user.account).values_list('customer', flat=True).distinct()
         
         context = {}
-        context['customer_ids'] = customer_ids
+        context['customer_ids'] = customer_ids        
         
-        if request.POST.get('customer_id'):
-            customer_id = request.POST.get('customer_id')
-            context['selected_chatter'] = customer_id
-            talks = queryset.filter(customer_id=customer_id).order_by('created_at')
-        else:
-            selected_chatter = customer_ids[0]
-            context['selected_chatter'] = selected_chatter
-            talks = queryset.filter(customer_id=customer_ids[0]).order_by('created_at')
+        selected_chatter = customer_ids[0]
+        context['selected_chatter'] = selected_chatter
+        talks = queryset.filter(customer_id=customer_ids[0]).order_by('created_at')
         print(talks)
         context['talks'] = talks
         return render(request, self.template_name, context)
@@ -50,5 +45,29 @@ class TalkDetail(LoginRequiredMixin,TemplateView):
         
         context['talks'] = talks
         return render(request, self.template_name, context)
-        
-        
+    
+    def post(self,request,customer_id):
+        try:
+            text = request.POST.get('text')
+            print(text)
+            talk = Talk()
+            talk.account = request.user.account
+            talk.customer_id = customer_id
+            talk.content = text
+            talk.is_push = False
+            if 'assets' in request.FILES:
+                assets = request.FILES.get('assets')
+                talk.video = assets
+            talk.save()
+            
+            return redirect("talk:talk-detail",customer_id=customer_id)
+        except:
+            messages.add_message(request, messages.ERROR, '失敗!') 
+            return redirect("talk:talk-detail",customer_id=customer_id)
+       
+    
+@login_required   
+def delete_talk(request,pk,customer_id):    
+    obj = get_object_or_404(Talk, id=pk)
+    obj.delete()
+    return redirect("talk:talk-detail",customer_id=customer_id)

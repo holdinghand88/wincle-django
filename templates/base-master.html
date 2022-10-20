@@ -65,13 +65,7 @@
                     <div class="dropdown-menu user-pro-dropdown">
 
                         <!-- item-->
-                        <a href="#" class="dropdown-item notify-item">
-                            <i class="fe-user mr-1"></i>
-                            <span>プロフィール</span>
-                        </a>
-
-                        <!-- item-->
-                        <a href="" class="dropdown-item notify-item">
+                        <a href="{% url 'dashboard:user-detail' pk=request.user.id%}" class="dropdown-item notify-item">
                             <i class="fe-settings mr-1"></i>
                             <span>設定</span>
                         </a>                      
@@ -191,15 +185,10 @@
                                 {{request.user.username}}<i class="mdi mdi-chevron-down"></i> 
                             </span>
                         </a>
-                        <div class="dropdown-menu dropdown-menu-right profile-dropdown ">
-                            <!-- item-->
-                            <a href="#" class="dropdown-item notify-item">
-                                <i class="ri-account-circle-line"></i>
-                                <span>プロフィール</span>
-                            </a>
+                        <div class="dropdown-menu dropdown-menu-right profile-dropdown ">                            
 
                             <!-- item-->
-                            <a href="javascript:void(0);" class="dropdown-item notify-item">
+                            <a href="{% url 'dashboard:user-detail' pk=request.user.id%}" class="dropdown-item notify-item">
                                 <i class="ri-settings-3-line"></i>
                                 <span>設定</span>
                             </a>

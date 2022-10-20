@@ -137,10 +137,9 @@
                                 <button class="btn btn-sm btn-link text-reset" data-toggle="dropdown"
                                     aria-expanded="false"><i class='mdi mdi-dots-vertical font-18'></i></button>
 
-                                <div class="dropdown-menu dropdown-menu-right">
-                                    <a class="dropdown-item" href="#">Copy Message</a>
-                                    <a class="dropdown-item" href="#">Edit</a>
-                                    <a class="dropdown-item" href="#">Delete</a>
+                                <div class="dropdown-menu dropdown-menu-right">                                    
+                                    <a class="dropdown-item" href="#">編集</a>
+                                    <a class="dropdown-item" href="{%url 'talk:talk-delete' pk=talk.id customer_id=selected_chatter%}"><i class="fe-trash-2"></i>削除</a>
                                 </div>
                             </div>
                         </li>
@@ -162,10 +161,9 @@
                                 <button class="btn btn-sm btn-link text-reset" data-toggle="dropdown"
                                     aria-expanded="false"><i class='mdi mdi-dots-vertical font-18'></i></button>
 
-                                <div class="dropdown-menu">
-                                    <a class="dropdown-item" href="#">Copy Message</a>
-                                    <a class="dropdown-item" href="#">Edit</a>
-                                    <a class="dropdown-item" href="#">Delete</a>
+                                <div class="dropdown-menu">                                    
+                                    <a class="dropdown-item" href="#">編集</a>
+                                    <a class="dropdown-item" href="{%url 'talk:talk-delete' pk=talk.id customer_id=selected_chatter%}"><i class="fe-trash-2"></i>削除</a>
                                 </div>
                             </div>
                         </li>
@@ -176,18 +174,21 @@
                     <div class="row">
                         <div class="col">
                             <div class="mt-2 bg-light p-3 rounded">
-                                <form class="needs-validation" novalidate="" name="chat-form"
-                                    id="chat-form">
+                                <form method="POST" action="{%url 'talk:talk-detail' customer_id=selected_chatter%}" enctype="multipart/form-data" id="chat-form">
+                                    {% csrf_token %}                                    
                                     <div class="row">
                                         <div class="col mb-2 mb-sm-0">
-                                            <input type="text" class="form-control border-0" placeholder="メッセージを入力してください。" required="">
+                                            <input type="text" class="form-control border-0" name="text" placeholder="メッセージを入力してください。" required="">
                                             <div class="invalid-feedback mt-2">
                                                 メッセージを入力してください。
                                             </div>
                                         </div>
                                         <div class="col-sm-auto">
                                             <div class="btn-group">
-                                                <a href="#" class="btn btn-light"><i class="fe-paperclip"></i></a>
+                                                <div class="fileupload btn btn-success waves-effect waves-light">                                                    
+                                                    <span><i class="mdi mdi-cloud-upload mr-1"></i></span>
+                                                    <input class="upload" type="file" name="assets">
+                                                </div>
                                                 <button type="submit" class="btn btn-success chat-send btn-block"><i class='fe-send'></i></button>
                                             </div>
                                         </div> <!-- end col -->

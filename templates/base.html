@@ -66,12 +66,6 @@
 
                         <!-- item-->
                         <a href="{% url 'dashboard:user-detail' pk=request.user.id%}" class="dropdown-item notify-item">
-                            <i class="fe-user mr-1"></i>
-                            <span>プロフィール</span>
-                        </a>
-
-                        <!-- item-->
-                        <a href="" class="dropdown-item notify-item">
                             <i class="fe-settings mr-1"></i>
                             <span>設定</span>
                         </a>                      
@@ -92,7 +86,7 @@
             <div id="sidebar-menu">
 
                 <ul id="side-menu">
-        
+                    {% if not user.is_staff%}
                     <li>
                         <a href="#sidebarDashboards" data-toggle="collapse" class="waves-effect">
                             <i class="ri-dashboard-line"></i>                            
@@ -109,7 +103,7 @@
                                 </li>                                                              
                             </ul>
                         </div>
-                    </li>
+                    </li>                    
                     <li>
                         <a href="#sidebarTask" data-toggle="collapse" class="waves-effect">
                             <i class="ri-task-line"></i>
@@ -138,8 +132,15 @@
                             <i class="ri-mail-line"></i>
                             <span>セグメント配信</span>                            
                         </a>                        
-                    </li>                 
-                   
+                    </li>
+                    {%else%}
+                    <li>
+                        <a href="{%url 'dashboard:dashboard-master'%}">ダッシュボード</a>
+                    </li>
+                    <li>
+                        <a href="{%url 'dashboard:childusermanage'%}">アカウント管理</a>
+                    </li>           
+                    {%endif%}
                 </ul>
 
             </div>
@@ -220,15 +221,10 @@
                                 {{request.user.username}}<i class="mdi mdi-chevron-down"></i> 
                             </span>
                         </a>
-                        <div class="dropdown-menu dropdown-menu-right profile-dropdown ">
-                            <!-- item-->
-                            <a href="{% url 'dashboard:user-detail' pk=request.user.id%}" class="dropdown-item notify-item">
-                                <i class="ri-account-circle-line"></i>
-                                <span>プロフィール</span>
-                            </a>
+                        <div class="dropdown-menu dropdown-menu-right profile-dropdown ">                           
 
                             <!-- item-->
-                            <a href="javascript:void(0);" class="dropdown-item notify-item">
+                            <a href="{% url 'dashboard:user-detail' pk=request.user.id%}" class="dropdown-item notify-item">
                                 <i class="ri-settings-3-line"></i>
                                 <span>設定</span>
                             </a>

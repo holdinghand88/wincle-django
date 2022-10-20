@@ -86,7 +86,7 @@ class Item(models.Model):
     updated_date = models.DateTimeField(auto_now_add=True,blank=True, null=True)    
     
     # CUD履歴管理
-    history = HistoricalRecords()
+    history = HistoricalRecords(cascade_delete_history=True)
     
     def __str__(self):
         return self.name

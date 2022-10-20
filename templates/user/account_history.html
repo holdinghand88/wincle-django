@@ -1,0 +1,234 @@
+{% extends "base-admin.html" %}
+{% load core_template %}
+{% load static %}
+{% block content %}      
+<div class="container-fluid">
+    <!-- start page title -->
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box">
+                <h4 class="page-title">アカウント履歴</h4>
+                
+            </div>
+        </div>
+    </div>     
+    <!-- end page title -->
+    <!-- start content -->
+    <div class="row">
+        <div class="col-xl-12 col-lg-12">            
+            <div class="card shadow">
+                <div class="card-body userlist">
+                    <table class="table table-hover table-scrollable">
+                        <thead class="card-header py-3">                                
+                            <th>履歴ID</th>
+                            <th>店舗名</th>
+                            <th>変更時間</th> 
+                            <th>変更</th>
+                            <th>履歴ユーザー</th>
+                            <th>ユーザー</th>
+                            <th>メニュー</th>                                
+                        </thead>
+                        <tbody>
+                            {% for obj in object_list %}
+                            <tr data-index="{{obj.history_id}}" class="list-item">
+                                <td>{{ obj.history_id}}</td>
+                                <td>{{obj.name}}</td>                                
+                                <td>{{ obj.history_date }}</td>                                
+                                <td>{{ obj.history_type }}</td>
+                                <td>{{ obj.history_user_id|get_user }}</td>  
+                                <td>{{ obj.user_id|get_user }}</td>                          
+                                <td >
+                                    <ul class="list-inline mb-0">
+                                        <li class="list-inline-item">
+                                            <a data-toggle="modal" data-target="#detailmodal_{{ obj.history_id }}"><i class="mdi mdi-eye"></i></a>
+                                        </li>
+                                        <div class="modal fade" id="detailmodal_{{ obj.history_id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h4>詳細情報</h4>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <table class="table table-borderless table-sm">
+                                                        <tbody>
+                                                            <tr>
+                                                                <th scope="row">店舗名 :</th>
+                                                                <td class="text-muted">{{obj.name}}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th scope="row">channel_id :</th>
+                                                                <td class="text-muted">{{obj.channel_id}}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th scope="row">channel_secret :</th>
+                                                                <td class="text-muted">{{obj.channel_secret}}</td>
+                                                            </tr>                                    
+                                                            <tr>
+                                                                <th scope="row">access_token :</th>
+                                                                <td class="text-muted">{{obj.access_token}}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th scope="row">住所 :</th>
+                                                                <td class="text-muted">{{obj.address}}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th scope="row">instagram_id :</th>
+                                                                <td class="text-muted">{{obj.instagram_id}}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th scope="row">notify_token :</th>
+                                                                <td class="text-muted">{{obj.notify_token}}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th scope="row">支払い方法 :</th>
+                                                                <td class="text-muted">{{obj.how_to_pay}}</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            </div>
+                                        </div>                                   
+                                        <li class="list-inline-item">
+                                            <a data-toggle="modal" data-target="#deletemodal_{{ obj.history_id }}"><i class="mdi mdi-delete"></i></a>
+                                        </li>
+                                        <div class="modal fade" id="deletemodal_{{ obj.history_id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h4>本当に削除しますか?</h4>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                                </div>
+                                                <form action="{% url 'dashboard:delete_account_history' history_id=obj.history_id %}" method="POST" enctype="multipart/form-data">   
+                                                    {% csrf_token %}                                     
+                                                    <div class="modal-footer">
+                                                    <button type="button" class="btn btn-danger" data-dismiss="modal">キャンセル</button>
+                                                    <button type="submit" class="btn btn-primary">はい</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            </div>
+                                        </div>
+                                    </ul>                                
+                                </td>                                
+                                
+                                                               
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        
+                    </table>
+
+                    <!--Pagination-->
+                    {% if is_paginated %}
+                    <nav class="d-flex justify-content-center wow fadeIn">
+                        <ul class="pagination pg-blue">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item btn-prev">
+                            <a
+                            class="page-link"
+                            href="?page={{ page_obj.previous_page_number }}"
+                            aria-label="Previous"
+                            >
+                            <span aria-hidden="true">&laquo;</span>
+                            <span class="sr-only">Previous</span>
+                            </a>
+                        </li>                        
+                        {% endif %}
+                        
+                        {% for i in page_obj.paginator.page_range %}
+                            {% if page_obj.number == i %}
+                            <li class="page-item active">
+                            <a class="page-link" href="?page={{ page_obj.number }}"
+                                >{{ i }}
+                                <span class="sr-only">(current)</span>
+                            </a>
+                            </li>
+                            {%else%}
+                                {% if i > page_obj.number|add:"-2" and i < page_obj.number|add:"2" %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ i }}"
+                                    >{{ i }}        
+                                    </a>
+                                </li>
+                                {% endif %}                                
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                        <li class="page-item btn-next">
+                            <a
+                            class="page-link"
+                            href="?page={{ page_obj.next_page_number }}"
+                            aria-label="Next"
+                            >
+                            <span aria-hidden="true">&raquo;</span>
+                            <span class="sr-only">Next</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end content -->
+</div> <!-- container -->
+
+{% endblock content %}
+{% block scripts %}
+<script>
+    
+    let inactiveto = button => {
+        var user_id = button.getAttribute('data-id');        
+        $('.modal').modal('hide');
+        $.ajax({
+            url : '{% url 'dashboard:inactive' %}',
+            data:{
+                user_id: user_id,
+                csrfmiddlewaretoken: "{{ csrf_token }}"
+            },
+            type:'POST',
+            success:function(data){
+                var data = JSON.parse(data);
+                console.log(data.active_status);
+                if(data.active_status == 1){
+                    $('.list-item[data-index="' + user_id + '"]').find('td:eq(2)').html('有効');
+                }else{
+                    $('.list-item[data-index="' + user_id + '"]').find('td:eq(2)').html('停止中');
+                }      
+                
+            }
+        });
+    }
+    $("#referral_code").css('display','none');
+    $("#name").css('display','none');
+    var is_multiple = $('input[type=checkbox][name=is_multiple]').prop('checked');
+    console.log(is_multiple);
+    if(is_multiple == false){
+        $("#name").css('display','block');
+    }else{
+        $("#referral_code").css('display','block');
+    }
+    $('input[type=checkbox][name=is_multiple]').change(function(){
+        const multiple = $('input[type=checkbox][name=is_multiple]').prop('checked');
+        console.log(multiple);
+        if(multiple == true){
+            $("#referral_code").css('display','block');
+            $("#name").css('display','none');
+        }else{
+            $("#name").css('display','block');
+            $("#referral_code").css('display','none');
+        }
+        
+    });
+    
+</script>
+{% endblock %}
