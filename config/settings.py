@@ -30,6 +30,7 @@ LOCAL_APPS = [
     'dashboard',
     'item',
     'talk',
+    'broadcast',
 ]
 DJANGO_APPS = [
     'django.contrib.admin',
@@ -50,6 +51,8 @@ THIRD_PARTY_APPS = [
     'allauth.socialaccount.providers.google',
     'rules.apps.AutodiscoverRulesConfig',
     'simple_history',
+    "django_extensions",
+    "sslserver",
 ]
 INSTALLED_APPS = LOCAL_APPS + DJANGO_APPS + THIRD_PARTY_APPS
 

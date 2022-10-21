@@ -7,8 +7,8 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box">
-                <h4 class="page-title">アカウント履歴</h4>
-                
+                <h4 class="page-title"><i class="mdi mdi-history"></i>&nbsp;&nbsp;配信履歴</h4>
+                <a href="{% url 'broadcast:message-view'%}" class="btn btn-primary btn-sm mb-1"><i class="mdi mdi-near-me"></i>&nbsp;&nbsp;メッセージ配信</a>
             </div>
         </div>
     </div>     
@@ -20,33 +20,29 @@
                 <div class="card-body userlist">
                     <table class="table table-hover table-scrollable">
                         <thead class="card-header py-3">                                
-                            <th>履歴ID</th>
-                            <th>店舗名</th>
-                            <th>変更時間</th> 
-                            <th>変更</th>
-                            <th>履歴ユーザー</th>
-                            <th>ユーザー</th>
+                            <th>内容</th>
+                            <th>ターゲット</th>
+                            <th>配信人数</th> 
+                            <th>配信日時</th>                            
                             <th>メニュー</th>                                
                         </thead>
                         <tbody>
                             {% for obj in object_list %}
-                            <tr data-index="{{obj.history_id}}" class="list-item">
-                                <td>{{ obj.history_id}}</td>
-                                <td>{{obj.name}}</td>                                
-                                <td>{{ obj.history_date }}</td>                                
-                                <td>{{ obj.history_type }}</td>
-                                <td>{{ obj.history_user_id|get_user }}</td>  
-                                <td>{{ obj.user_id|get_user }}</td>                          
+                            <tr data-index="{{obj.id}}" class="list-item">
+                                <td>{{ obj.content|truncatechars:10}}</td>
+                                <td>{{obj.target}}</td>                                
+                                <td>{{ obj.customer.all|length }}</td>                                
+                                <td>{{ obj.created_at }}</td>                                                        
                                 <td >
                                     <ul class="list-inline mb-0">
                                         <li class="list-inline-item">
-                                            <a data-toggle="modal" data-target="#detailmodal_{{ obj.history_id }}"><i class="mdi mdi-eye"></i></a>
+                                            <a data-toggle="modal" data-target="#detailmodal_{{ obj.id }}"><i class="mdi mdi-eye"></i></a>
                                         </li>
-                                        <div class="modal fade" id="detailmodal_{{ obj.history_id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                        <div class="modal fade" id="detailmodal_{{ obj.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
                                             <div class="modal-dialog modal-dialog-centered" role="document">
                                             <div class="modal-content">
                                                 <div class="modal-header">
-                                                    <h4>詳細情報</h4>
+                                                    <h4>配信内容</h4>
                                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                         <span aria-hidden="true">&times;</span>
                                                     </button>
@@ -55,37 +51,18 @@
                                                     <table class="table table-borderless table-sm">
                                                         <tbody>
                                                             <tr>
-                                                                <th scope="row">店舗名 :</th>
-                                                                <td class="text-muted">{{obj.name}}</td>
+                                                                <th scope="row">メッセージ :</th>
+                                                                <td class="text-muted">{{obj.content}}</td>
                                                             </tr>
                                                             <tr>
-                                                                <th scope="row">channel_id :</th>
-                                                                <td class="text-muted">{{obj.channel_id}}</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th scope="row">channel_secret :</th>
-                                                                <td class="text-muted">{{obj.channel_secret}}</td>
-                                                            </tr>                                    
-                                                            <tr>
-                                                                <th scope="row">access_token :</th>
-                                                                <td class="text-muted">{{obj.access_token}}</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th scope="row">住所 :</th>
-                                                                <td class="text-muted">{{obj.address}}</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th scope="row">instagram_id :</th>
-                                                                <td class="text-muted">{{obj.instagram_id}}</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th scope="row">notify_token :</th>
-                                                                <td class="text-muted">{{obj.notify_token}}</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th scope="row">支払い方法 :</th>
-                                                                <td class="text-muted">{{obj.how_to_pay}}</td>
-                                                            </tr>
+                                                                <th scope="row">送信先 :</th>
+                                                                <td class="text-muted">
+                                                                    {%for customer in obj.customer.all%}
+                                                                    <span class="badge badge-primary badge-pill">{{customer.name}}</span>
+                                                                    {%endfor%}
+                                                                </td>
+                                                            </tr>                                                                                             
+                                                            
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -93,9 +70,9 @@
                                             </div>
                                         </div>                                   
                                         <li class="list-inline-item">
-                                            <a data-toggle="modal" data-target="#deletemodal_{{ obj.history_id }}"><i class="mdi mdi-delete"></i></a>
+                                            <a data-toggle="modal" data-target="#deletemodal_{{ obj.id }}"><i class="mdi mdi-delete"></i></a>
                                         </li>
-                                        <div class="modal fade" id="deletemodal_{{ obj.history_id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                        <div class="modal fade" id="deletemodal_{{ obj.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
                                             <div class="modal-dialog modal-dialog-centered" role="document">
                                             <div class="modal-content">
                                                 <div class="modal-header">
@@ -104,7 +81,7 @@
                                                     <span aria-hidden="true">&times;</span>
                                                 </button>
                                                 </div>
-                                                <form action="{% url 'dashboard:delete_account_history' history_id=obj.history_id %}" method="POST" enctype="multipart/form-data">   
+                                                <form action="{% url 'broadcast:broadcast-delete' pk=obj.id %}" method="POST" enctype="multipart/form-data">   
                                                     {% csrf_token %}                                     
                                                     <div class="modal-footer">
                                                     <button type="button" class="btn btn-danger" data-dismiss="modal">キャンセル</button>
@@ -185,7 +162,6 @@
 {% endblock content %}
 {% block scripts %}
 <script>    
-    
     
 </script>
 {% endblock %}

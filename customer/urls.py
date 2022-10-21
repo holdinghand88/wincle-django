@@ -15,4 +15,7 @@ urlpatterns = [
     # Ajax Search Urls
     path('delete-checked', views.CustomerDeleteCheckedView.as_view(), name='customer-delete-checked'),
     path('customer-list-search/', views.CustomerNameDetailSearchView.as_view(), name='customer-list-search'),
+    
+    # Customer Filter
+    path('filter_customer', views.filter_customer, name='filter_customer'),
 ]

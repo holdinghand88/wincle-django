@@ -163,3 +163,26 @@ class CustomerDeleteCheckedView(View):
             Customer.objects.get(id=id).delete()
         return JsonResponse({})
 
+
+def filter_customer(request):
+    name = request.POST.get('name')
+    line_name = request.POST.get('line_name')
+    tel = request.POST.get('tel')
+    tags = request.POST.get('tags')
+    
+    q = Q()
+    if name or line_name or tel or tags:
+        if name:
+            q &= Q(name__icontains=name)
+        if line_name:
+            q &= Q(line_name__exact=line_name)                
+        if tel:
+            q &= Q(tel__exact=tel)                
+        if tags:
+            q &= Q(tags__exact=tags)
+
+        customers = Customer.objects.filter(q).filter(account_id=request.user.account.id)
+    else:
+        customers = Customer.objects.filter(account_id=request.user.account.id)
+    print(customers)
+    return JsonResponse({'customers': len(customers)})

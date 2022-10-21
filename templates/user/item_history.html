@@ -184,49 +184,7 @@
 {% block scripts %}
 <script>
     
-    let inactiveto = button => {
-        var user_id = button.getAttribute('data-id');        
-        $('.modal').modal('hide');
-        $.ajax({
-            url : '{% url 'dashboard:inactive' %}',
-            data:{
-                user_id: user_id,
-                csrfmiddlewaretoken: "{{ csrf_token }}"
-            },
-            type:'POST',
-            success:function(data){
-                var data = JSON.parse(data);
-                console.log(data.active_status);
-                if(data.active_status == 1){
-                    $('.list-item[data-index="' + user_id + '"]').find('td:eq(2)').html('有効');
-                }else{
-                    $('.list-item[data-index="' + user_id + '"]').find('td:eq(2)').html('停止中');
-                }      
-                
-            }
-        });
-    }
-    $("#referral_code").css('display','none');
-    $("#name").css('display','none');
-    var is_multiple = $('input[type=checkbox][name=is_multiple]').prop('checked');
-    console.log(is_multiple);
-    if(is_multiple == false){
-        $("#name").css('display','block');
-    }else{
-        $("#referral_code").css('display','block');
-    }
-    $('input[type=checkbox][name=is_multiple]').change(function(){
-        const multiple = $('input[type=checkbox][name=is_multiple]').prop('checked');
-        console.log(multiple);
-        if(multiple == true){
-            $("#referral_code").css('display','block');
-            $("#name").css('display','none');
-        }else{
-            $("#name").css('display','block');
-            $("#referral_code").css('display','none');
-        }
-        
-    });
+    
     
 </script>
 {% endblock %}

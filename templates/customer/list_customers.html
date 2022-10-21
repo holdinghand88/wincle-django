@@ -1,10 +1,9 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block headers %}
-    {% load static %}
+    
     <!--Plug in-->
-    <link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css"
-          rel="stylesheet">
+    
 {% endblock %}
 
 {% block content %}
@@ -41,6 +40,8 @@
                                             data-toggle="modal" data-target="#settings-modal"><i
                                             class="mdi mdi-cog mr-1"></i>表示設定
                                     </button>
+                                    <a href="{%url 'customer:customers-list'%}" type="button" class="btn bg-info mb-2 mr-1 text-white"><i class="ri-refresh-line"></i>
+                                    </a>
                                 </div>
                             </div>
 
@@ -54,12 +55,12 @@
                                         <div class="modal-content">
                                             <div class="modal-header">
                                                 <h4>顧客新規登録</h4>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                 <span aria-hidden="true">&times;</span>
-                                            </button>
+                                                </button>
                                             </div>
                                             <form action="{% url 'customer:customer-create' %}" method="POST" enctype="multipart/form-data">   
-                                                <div class="modal-body">
+                                                <div class="modal-body text-sm-left">
                                                     {% csrf_token %}
                                                     <input type="hidden" class="form-control" name="account_id" value="{{request.user.account.id}}" required>                                              
                                                     <div class="form-group">
@@ -254,8 +255,7 @@
     </div><!-- /.modal -->
 {% endblock %}
 
-{% block scripts %}
-    # Scripts for infinite scroll
+{% block scripts %}    
     <script src="{% static 'assets/js/jquery.waypoints.min.js' %}"></script>
     <script src="{% static 'assets/js/infinite.min.js' %}"></script>
     <script src="{% static 'assets/libs/bootstrap-datepicker/js/bootstrap-datepicker.min.js' %}"></script>

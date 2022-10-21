@@ -12,7 +12,8 @@ urlpatterns = [
     path('', include('dashboard.urls')),   
     path('customer/', include('customer.urls',namespace='customer')),
     path('item/', include('item.urls',namespace='item')),
-    path('talk/', include('talk.urls',namespace='talk')), 
+    path('talk/', include('talk.urls',namespace='talk')),
+    path('broadcast/', include('broadcast.urls',namespace='broadcast')),
 ]
 
 if not settings.PRODUCTION:

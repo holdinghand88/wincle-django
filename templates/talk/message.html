@@ -1,0 +1,279 @@
+{% extends "base.html" %}
+{% load core_template %}
+{% load static %}
+{% block content %}
+<style media="screen">
+    .line-bc {
+      max-width: 450px;
+      text-align: right;
+      font-size: 14px;
+    }
+    
+    /*以下、②左側のコメント*/
+    .balloon6 {
+      width: 100%;
+      margin: 10px 0;
+      overflow: hidden;
+    }
+    
+    .balloon6 .faceicon {
+      float: left;
+      margin-right: -50px;
+      width: 40px;
+    }
+    
+    .balloon6 .faceicon img{
+      width: 100%;
+      height: auto;
+      border-radius: 50%;
+    }
+    .balloon6 .chatting {
+      width: 100%;
+      text-align: left;
+    }
+    .says {
+      display: inline-block;
+      position: relative;
+      margin: 0 0 0 50px;
+      padding: 10px;
+      max-width: 250px;
+      border-radius: 12px;
+      background: white;
+    }
+    
+    .says:after {
+      content: "";
+      display: inline-block;
+      position: absolute;
+      top: 3px;
+      left: -19px;
+      border: 8px solid transparent;
+      border-right: 18px solid white;
+      -webkit-transform: rotate(35deg);
+      transform: rotate(35deg);
+    }
+    .says p {
+      margin: 0;
+      padding: 0;
+    }
+    .hidden{
+        display: none;
+    }
+</style>
+<div class="container-fluid">
+    <!-- start page title -->
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box">
+                <h4 class="page-title"><i class="mdi mdi-near-me"></i>メッセージ配信</h4>
+                <a href="{% url 'broadcast:broadcast-list'%}" class="btn btn-primary btn-sm mb-1"><i class="mdi mdi-history"></i>&nbsp;&nbsp;配信履歴</a>
+            </div>
+        </div>
+    </div>     
+    <!-- end page title -->
+    <!-- start content -->
+    <div class="row">
+        <!-- start chat users-->
+        <div class="col-xl-12 col-lg-12">
+            <div class="card">
+                <div class="card-body">               
+                    <p class="presmall mb-0">今月のメッセージ利用状況</p>
+                    <p class="presmall text-muted mb-0">配信済みの無料メッセージ数  <span class="" style="font-size:1.2rem;">{{amount}}/{{limit}}</span></p>
+                    <div class="progress mt-2 mb-3">
+                        <div class="progress-bar progress-bar-striped bg-info" role="progressbar" style="width:{{rate}}%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <hr>
+                    <form class="presmall" method="POST">
+                        {% csrf_token %}   
+                        <div class="form-group row">
+                            <legend class="col-form-label col-md-1 pt-0 font-weight-bold">配信先</legend>
+                            <div class="col-md-11">
+                            <div class="custom-control custom-radio">
+                                <input id="customRadio1" name="is_all" type="radio" class="custom-control-input" value="1" checked>
+                                <label class="custom-control-label" for="customRadio1">すべての友だち</label>
+                            </div>
+                            <div class="custom-control custom-radio">
+                                <input id="customRadio2" name="is_all" type="radio" class="custom-control-input" value="0">
+                                <label class="custom-control-label" for="customRadio2">絞り込む</label>
+                            </div>
+                            <div class="card my-3 w-50 search-card hidden">
+                                <div class="card-body">
+                                <div class="form-group row align-items-center">
+                                    <label for="" class="col-form-label col-md-3 text-muted">名前</label>
+                                    <div class="col-md-9">
+                                    <input type="text" name="name" class="form-control" value="">
+                                    </div>
+                                </div>
+                                <div class="form-group row align-items-center">
+                                    <label for="" class="col-form-label col-md-3 text-muted">LINE名</label>
+                                    <div class="col-md-9">
+                                    <input type="text" name="line_name" class="form-control" value="">
+                                    </div>
+                                </div>
+                                <div class="form-group row align-items-center">
+                                    <label for="" class="col-form-label col-md-3 text-muted">電話番号</label>
+                                    <div class="col-md-9">
+                                    <input type="tel" name="tel" class="form-control" value="">
+                                    </div>
+                                </div>
+                                <div class="form-group row align-items-center">
+                                    <label for="" class="col-form-label col-md-3 text-muted">タグ</label>
+                                    <div class="col-md-9">
+                                    <input type="text" name="tags" class="form-control" value="">
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <button type="button" class="btn btn-sm btn-info py-2 px-4 btn-confirm-count align-items-center">
+                                    配信人数を確認する
+                                    </button>
+                                    <h5 class="mb-0"><span class="badge badge-success py-2 px-3 text-count">配信人数：?人</span></h5>
+                                </div>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-8">
+                            <div class="form-group">
+                                <label class="mb-0 font-weight-bold" for="">メッセージ</label><br>
+                                <span class="small text-info"><i class="fas fa-info-circle"></i> 最大５つのメッセージを1通のメッセージとして一括送信できます。</span>
+                                {% for i in range %}
+                                <div class="card message-card shadow-sm mt-2 mb-3 {%if i != 0 %}hidden{%endif%}">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between">
+                                            <label for="">メッセージタイプ</label>
+                                            <i class="fas fa-times fa-lg remove-message-card text-muted" style="cursor:pointer;"></i>
+                                        </div>
+                                        <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                            <label class="btn btn-sm btn-outline-primary px-4 active rounded-pill">
+                                                <input type="radio" class="message_type" name="message_types[{{i}}][]" value="text" id="option1" checked>テキスト
+                                            </label>
+                                            <label class="btn btn-sm btn-outline-primary px-4 mx-2 rounded-pill">
+                                                <input type="radio" class="message_type" name="message_types[{{i}}][]" value="image" id="option2">画像
+                                            </label>
+                                            <label class="btn btn-sm btn-outline-primary px-4 rounded-pill">
+                                                <input type="radio" class="message_type" name="message_types[{{i}}][]" value="videos" id="option3">動画
+                                            </label>
+                                        </div>
+                                        <textarea name="contents[{{i}}]" rows="3" class="form-control mt-3 text-message" placeholder="テキストを入力"></textarea>
+                                        <div class="custom-file image-message hidden">
+                                            <input type="text" name="images[{{i}}]" class="form-control mt-3" placeholder="画像URLを入力">
+                                        </div>
+                                        <div class="custom-file movie-message hidden">
+                                            <input type="text" name="videos[{{i}}][0]" class="form-control mt-3" placeholder="動画URLを入力">
+                                            <input type="text" name="videos[{{i}}][1]" class="form-control mt-3" placeholder="プレビュー画像URLを入力">
+                                        </div>
+                                    </div>
+                                </div>
+                                {%endfor%}
+                                <button type="button" class="btn btn-sm btn-outline-success px-4 py-2 add-message-card"><i class="fas fa-plus"></i> 追加</button>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <button type="submit" data-confirm="今すぐ配信されます。よろしいでしょうか？" class="btn btn-sm btn-primary px-5 py-2">配信</button>
+                            </div>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel">
+                        <div class="modal-dialog modal-dialog-scrollable" style="width:400px;">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                            <p class="modal-title font-weight-bold" id="exampleModalLabel">プレビュー</p>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="閉じる">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            </div>
+                            <div class="modal-body bg-fb">
+                            <div class="line-bc">
+                            </div>
+                            </div>
+                        </div><!-- /.modal-content -->
+                        </div><!-- /.modal-dialog -->
+                    </div>
+                </div>   
+            </div> <!-- end card-->
+        </div>
+        <!-- end chat users-->        
+        
+    </div>
+    <!-- end content -->    
+</div> <!-- container -->
+
+{% endblock content %}
+{% block scripts %}
+<script>
+    $('.sidebar .list-group a:eq(4)').removeClass("bg-transparent").addClass("bg-light b-900");
+    $('input[name="is_all"]').change(function () {
+        if ($(this).val() == "1") {
+            $('.search-card').addClass("hidden");
+        } else {
+            $('.search-card').removeClass("hidden");
+            //$('.select-reserve-item').chosen();
+        }
+    })
+    $('.message_type').change(function () {
+        var value = $(this).val();
+        var parent_element = $(this).parents(".message-card");
+        switch (value) {
+            case "text":
+            parent_element.find('.movie-message').addClass("hidden");
+            parent_element.find('.image-message').addClass("hidden");
+            parent_element.find('.text-message').removeClass("hidden");
+            break;
+            case "image":
+            parent_element.find('.image-message').removeClass("hidden");
+            parent_element.find('.movie-message').addClass("hidden");
+            parent_element.find('.text-message').addClass("hidden");
+            break;
+            case "movie":
+            parent_element.find('.image-message').addClass("hidden");
+            parent_element.find('.movie-message').removeClass("hidden");
+            parent_element.find('.text-message').addClass("hidden");
+            break;
+        }
+    })
+    $('.add-message-card').click(function () {
+        $('.message-card.hidden:first').removeClass("hidden");
+    })
+    $('.remove-message-card').click(function () {
+        if ($('.message-card.hidden').length != 4) {
+            $(this).parents(".message-card").addClass("hidden");
+            $(this).parents(".message-card").find('.text-message').val("");
+            $(this).parents(".message-card").find('.select-item').val('').trigger("chosen:updated");
+            $(this).parents(".message-card").find('.item-content').val('');
+            $(this).parents(".message-card").find('.select-coupon').val('').trigger("chosen:updated");
+            $(this).parents(".message-card").find('.select-survey').val('').trigger("chosen:updated");
+        }
+    })
+    
+    $('.btn-confirm-count').click(function () {
+        $(this).append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
+        var name = $('input[name="name"]').val();
+        var line_name = $('input[name="line_name"]').val();
+        var tel = $('input[name="tel"]').val();
+        var tags = $('input[name="tags"]').val();
+        $.ajax({
+            type: 'POST',
+            url: '{% url 'customer:filter_customer' %}',
+            data: {
+                name: name,
+                line_name: line_name,
+                tel: tel,
+                tags: tags,
+                csrfmiddlewaretoken: "{{ csrf_token }}"
+            },
+            dataType: 'json'
+        }).done(function (customers) {
+            console.log(customers)
+            $('.spinner-border').remove();
+            $('.text-count').text(`配信人数：${customers.customers}人`)
+        });
+    })
+    $('.custom-file-input').on('change',function(){
+        $(this).next('.custom-file-label').html($(this)[0].files[0].name);
+    })
+    
+    
+</script>
+
+{% endblock %}

@@ -5,6 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator
 from django.db import models, transaction
 from core.customfields import ULIDField, TranslatedField
+from simple_history.models import HistoricalRecords
 from django.utils import timezone
 from datetime import datetime
 import pytz
@@ -48,6 +49,9 @@ class Customer(models.Model):
     deleted_at = models.DateTimeField(_(u'Deleted Date At'), blank=True, null=True)
     deleted_by = models.CharField(_(u'Deleted Person By'), max_length=26, blank=True, null=True)
     
+    # CUD履歴管理
+    history = HistoricalRecords(cascade_delete_history=True)
+    
     def __str__(self):
         return self.name
 
@@ -61,6 +65,7 @@ class NotificationAction(models.Model):
     '''
     name = models.CharField(max_length=50)
     effect = models.BooleanField(default=True)
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
     
     def __str__(self):
         return self.name
@@ -76,7 +81,7 @@ class Notification(models.Model):
     created_at = models.DateTimeField(_(u'Created Date At'), editable=False, auto_now_add=True)
     
     def __str__(self):
-        return self.action.name+'by'+self.user.last_name_jp
+        return self.action.name+'by'+self.user.email
     
     @property
     def notification_text(self):
